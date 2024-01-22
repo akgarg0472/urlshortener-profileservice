@@ -1,6 +1,7 @@
 package com.akgarg.profile.profile.v1;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -9,6 +10,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class Profile {
 
     private String id;
@@ -36,5 +38,9 @@ public class Profile {
     private boolean premiumAccount;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+    public Profile(final String id) {
+        this.id = id;
+    }
 
 }

@@ -3,6 +3,7 @@ package com.akgarg.profile.profile.v1.db;
 import com.akgarg.profile.profile.v1.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public class MysqlDatabaseService implements DatabaseService {
@@ -15,12 +16,12 @@ public class MysqlDatabaseService implements DatabaseService {
 
 
     @Override
-    public Optional<Profile> findByProfileId(String profileId) {
-        return Optional.empty();
+    public boolean addProfile(final Profile profile) {
+        return false;
     }
 
     @Override
-    public Optional<Profile> findByEmail(String email) {
+    public Optional<Profile> findByProfileId(String profileId) {
         return Optional.empty();
     }
 
@@ -37,6 +38,11 @@ public class MysqlDatabaseService implements DatabaseService {
     @Override
     public boolean updatePassword(String profileId, String encryptedPassword) {
         return false;
+    }
+
+    @Override
+    public Collection<Profile> findAllProfiles() {
+        throw new UnsupportedOperationException("MySQL database service doesn't support findAllProfiles");
     }
 
 }

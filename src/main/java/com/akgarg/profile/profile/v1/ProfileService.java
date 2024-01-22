@@ -1,5 +1,6 @@
 package com.akgarg.profile.profile.v1;
 
+import com.akgarg.profile.exception.BadRequestException;
 import com.akgarg.profile.exception.ResourceNotFoundException;
 import com.akgarg.profile.notification.NotificationService;
 import com.akgarg.profile.profile.v1.db.DatabaseService;
@@ -31,34 +32,44 @@ public class ProfileService {
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
 
-    public ProfileService(@Nonnull final DatabaseService databaseService,
-                          @Nonnull final NotificationService notificationService) {
+    public ProfileService(
+            @Nonnull final DatabaseService databaseService,
+            @Nonnull final NotificationService notificationService
+    ) {
         this.databaseService = databaseService;
         this.notificationService = notificationService;
         this.passwordEncoder = new BCryptPasswordEncoder(PASSWORD_ENCODER_STRENGTH);
     }
 
-    public Optional<ProfileDTO> getProfileByProfileId(@Nonnull final HttpServletRequest httpRequest,
-                                                      @Nonnull final String userId) {
+    public Optional<ProfileDTO> getProfileByProfileId(
+            @Nonnull final HttpServletRequest httpRequest,
+            @Nonnull final String profileId
+    ) {
+        checkProfileId(profileId);
+
         final var requestId = extractRequestIdFromRequest(httpRequest);
 
-        LOGGER.info("[{}] get profile by profile id: {}", requestId, userId);
+        LOGGER.debug("[{}] get profile received for profile id: {}", requestId, profileId);
 
-        final Optional<Profile> profile = databaseService.findByProfileId(userId);
+        final Optional<Profile> profile = databaseService.findByProfileId(profileId);
 
         if (profile.isEmpty()) {
-            LOGGER.error("[{}] profile not found by id: {}", requestId, userId);
+            LOGGER.error("[{}] profile not found by id: {}", requestId, profileId);
             return Optional.empty();
         }
 
         return Optional.of(ProfileDTO.fromProfile(profile.get()));
     }
 
-    public DeleteResponse deleteProfile(@Nonnull final HttpServletRequest httpRequest,
-                                        @Nonnull final String profileId) {
+    public DeleteResponse deleteProfile(
+            @Nonnull final HttpServletRequest httpRequest,
+            @Nonnull final String profileId
+    ) {
+        checkProfileId(profileId);
+
         final var requestId = extractRequestIdFromRequest(httpRequest);
 
-        LOGGER.info("[{}] get profile by user id: {}", requestId, profileId);
+        LOGGER.info("[{}] Profile delete request for id={} received", requestId, profileId);
 
         final boolean profileDeleted = databaseService.deleteProfileById(profileId);
 
@@ -66,7 +77,7 @@ public class ProfileService {
             return new DeleteResponse(HttpStatus.OK.value(), "Profile deleted successfully");
         }
 
-        return new DeleteResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error deleting profile by id: " + profileId);
+        return new DeleteResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error deleting profile for id: " + profileId);
     }
 
     public UpdateResponse updateProfile(
@@ -74,9 +85,11 @@ public class ProfileService {
             @Nonnull final String profileId,
             @Nonnull final UpdateProfileRequest request
     ) {
+        checkProfileId(profileId);
+
         final var requestId = extractRequestIdFromRequest(httpRequest);
 
-        LOGGER.info("[{}] update profile request for id={}: {}", requestId, profileId, request);
+        LOGGER.info("[{}] Profile update request for id={} received: {}", requestId, profileId, request);
 
         final Profile profile = getProfileById(requestId, profileId);
 
@@ -122,15 +135,19 @@ public class ProfileService {
         return UpdateResponse.ok("Profile successfully updated");
     }
 
-    public UpdateResponse updatePassword(@Nonnull final HttpServletRequest httpRequest,
-                                         @Nonnull final String profileId,
-                                         @Nonnull final UpdatePasswordRequest updatePasswordRequest) {
+    public UpdateResponse updatePassword(
+            @Nonnull final HttpServletRequest httpRequest,
+            @Nonnull final String profileId,
+            @Nonnull final UpdatePasswordRequest updatePasswordRequest
+    ) {
+        checkProfileId(profileId);
+
         final var requestId = extractRequestIdFromRequest(httpRequest);
 
         LOGGER.info("[{}] update password request: {}", requestId, profileId);
 
         if (!arePasswordsEqual(updatePasswordRequest)) {
-            LOGGER.warn("[{}] New Passwords mismatched", requestId);
+            LOGGER.warn("[{}] New password and confirm password mismatched", requestId);
             return UpdateResponse.badRequest("New password and confirm password mismatched");
         }
 
@@ -151,15 +168,17 @@ public class ProfileService {
         }
 
         LOGGER.info("[{}] password updated successfully", requestId);
-        notificationService.sendPasswordChangedSuccessEmail();
+        notificationService.sendPasswordChangedSuccessEmail(profile.getEmail());
         return UpdateResponse.ok("Password updated successfully");
     }
 
-    private Profile getProfileById(@Nonnull final Object requestId,
-                                   @Nonnull final String profileId) {
+    private Profile getProfileById(
+            @Nonnull final Object requestId,
+            @Nonnull final String profileId
+    ) {
         return databaseService.findByProfileId(profileId)
                 .orElseThrow(() -> {
-                    LOGGER.warn("[{}] profile not found with id: {}", requestId, profileId);
+                    LOGGER.warn("[{}] not profile found with id: {}", requestId, profileId);
                     return new ResourceNotFoundException("Profile not found with id: " + profileId);
                 });
     }
@@ -172,9 +191,17 @@ public class ProfileService {
         return passwordEncoder.encode(rawPassword);
     }
 
-    private boolean matchPassword(@Nonnull final String rawPassword,
-                                  @Nonnull final String hashedPassword) {
+    private boolean matchPassword(
+            @Nonnull final String rawPassword,
+            @Nonnull final String hashedPassword
+    ) {
         return passwordEncoder.matches(rawPassword, hashedPassword);
+    }
+
+    private void checkProfileId(final String profileId) {
+        if (profileId == null || profileId.isBlank()) {
+            throw new BadRequestException(new String[]{"Invalid profile id provided: " + profileId}, "Bad Request");
+        }
     }
 
 }
