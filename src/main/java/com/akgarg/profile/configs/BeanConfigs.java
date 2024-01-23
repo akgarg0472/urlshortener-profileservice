@@ -1,11 +1,11 @@
 package com.akgarg.profile.configs;
 
+import com.akgarg.profile.db.MysqlDatabaseService;
 import com.akgarg.profile.notification.KafkaNotificationService;
 import com.akgarg.profile.notification.NotificationService;
 import com.akgarg.profile.notification.VoidNotificationService;
-import com.akgarg.profile.profile.v1.db.DatabaseService;
-import com.akgarg.profile.profile.v1.db.InMemoryDatabaseService;
-import com.akgarg.profile.profile.v1.db.MysqlDatabaseService;
+import com.akgarg.profile.db.DatabaseService;
+import com.akgarg.profile.db.InMemoryDatabaseService;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;

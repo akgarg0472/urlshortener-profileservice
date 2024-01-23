@@ -3,7 +3,7 @@ package com.akgarg.profile.profile.v1;
 import com.akgarg.profile.exception.BadRequestException;
 import com.akgarg.profile.exception.ResourceNotFoundException;
 import com.akgarg.profile.notification.NotificationService;
-import com.akgarg.profile.profile.v1.db.DatabaseService;
+import com.akgarg.profile.db.DatabaseService;
 import com.akgarg.profile.request.UpdatePasswordRequest;
 import com.akgarg.profile.request.UpdateProfileRequest;
 import com.akgarg.profile.response.DeleteResponse;

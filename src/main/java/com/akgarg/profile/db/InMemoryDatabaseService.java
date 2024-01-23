@@ -1,4 +1,4 @@
-package com.akgarg.profile.profile.v1.db;
+package com.akgarg.profile.db;
 
 import com.akgarg.profile.profile.v1.Profile;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +25,6 @@ public class InMemoryDatabaseService implements DatabaseService {
     @Override
     public boolean addProfile(final Profile profile) {
         Objects.requireNonNull(profile, "Profile can't be null");
-        LOGGER.info("Adding profile to DB: {}", profile.getId());
         return db.putIfAbsent(profile.getId(), profile) == null;
     }
 
@@ -40,7 +39,6 @@ public class InMemoryDatabaseService implements DatabaseService {
         Objects.requireNonNull(profile, "Profile can't be null");
 
         if (!db.containsKey(profile.getId())) {
-            LOGGER.warn("No profile found with id: {}", profile.getId());
             return false;
         }
 
@@ -50,9 +48,7 @@ public class InMemoryDatabaseService implements DatabaseService {
     @Override
     public boolean deleteProfileById(final String profileId) {
         Objects.requireNonNull(profileId, PROFILE_ID_CANT_NULL);
-        final boolean profileDeleted = db.remove(profileId) != null;
-        LOGGER.info("Profile with id={} deleted: {}", profileId, profileDeleted);
-        return profileDeleted;
+        return db.remove(profileId) != null;
     }
 
     @Override
@@ -63,7 +59,6 @@ public class InMemoryDatabaseService implements DatabaseService {
         final Profile profile = db.get(profileId);
 
         if (profile == null) {
-            LOGGER.warn("No profile found with id: {}", profileId);
             return false;
         }
 

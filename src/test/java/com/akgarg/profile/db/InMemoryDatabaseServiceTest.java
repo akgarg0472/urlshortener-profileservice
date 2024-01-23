@@ -1,21 +1,20 @@
 package com.akgarg.profile.db;
 
 import com.akgarg.profile.profile.v1.Profile;
-import com.akgarg.profile.profile.v1.db.DatabaseService;
-import com.akgarg.profile.profile.v1.db.InMemoryDatabaseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.util.Optional;
 
+import static com.akgarg.profile.db.DatabaseTestUtil.getProfileObject;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class InMemoryDatabaseServiceTest {
 
-    private DatabaseService databaseService;
+    private InMemoryDatabaseService databaseService;
 
     @BeforeEach
     void setUp() {
@@ -79,33 +78,29 @@ class InMemoryDatabaseServiceTest {
 
     @Test
     void addProfile_ShouldThrowException_WhenProfileIsNull() {
-        assertThrows(NullPointerException.class, () -> databaseService.addProfile(null), "addProfile should throw NullPointerException when profile instance is null");
+        assertThrowsExactly(NullPointerException.class, () -> databaseService.addProfile(null), "addProfile should throw NullPointerException when profile instance is null");
     }
 
     @Test
     void findByProfileId_ShouldThrowException_WhenProfileIdIsNull() {
-        assertThrows(NullPointerException.class, () -> databaseService.findByProfileId(null), "findByProfileId should throw NullPointerException when profileId is null");
+        assertThrowsExactly(NullPointerException.class, () -> databaseService.findByProfileId(null), "findByProfileId should throw NullPointerException when profileId is null");
     }
 
     @Test
     void updateProfile_ShouldThrowException_WhenProfileIsNull() {
-        assertThrows(NullPointerException.class, () -> databaseService.updateProfile(null), "updateProfile should throw NullPointerException when profile instance is null");
+        assertThrowsExactly(NullPointerException.class, () -> databaseService.updateProfile(null), "updateProfile should throw NullPointerException when profile instance is null");
     }
 
     @Test
     void deleteProfileById_ShouldThrowException_WhenProfileIdIsNull() {
-        assertThrows(NullPointerException.class, () -> databaseService.deleteProfileById(null), "deleteProfileById should throw NullPointerException when profileId is null");
+        assertThrowsExactly(NullPointerException.class, () -> databaseService.deleteProfileById(null), "deleteProfileById should throw NullPointerException when profileId is null");
     }
 
     @Test
     void updatePassword_ShouldThrowException_WhenEitherOfParamsIsNull() {
-        assertThrows(NullPointerException.class, () -> databaseService.updatePassword(null, ""), "updatePassword should throw NullPointerException when profileId is null");
-        assertThrows(NullPointerException.class, () -> databaseService.updatePassword("", null), "updatePassword should throw NullPointerException when encryptedPassword is null");
-        assertThrows(NullPointerException.class, () -> databaseService.updatePassword(null, null), "updatePassword should throw NullPointerException when both params are null");
-    }
-
-    private Profile getProfileObject(final String profileId) {
-        return new Profile(profileId);
+        assertThrowsExactly(NullPointerException.class, () -> databaseService.updatePassword(null, ""), "updatePassword should throw NullPointerException when profileId is null");
+        assertThrowsExactly(NullPointerException.class, () -> databaseService.updatePassword("", null), "updatePassword should throw NullPointerException when encryptedPassword is null");
+        assertThrowsExactly(NullPointerException.class, () -> databaseService.updatePassword(null, null), "updatePassword should throw NullPointerException when both params are null");
     }
 
 }

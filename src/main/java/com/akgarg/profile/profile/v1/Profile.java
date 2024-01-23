@@ -33,9 +33,11 @@ public class Profile {
     @ToString.Exclude
     private String forgotPasswordToken;
 
+    private boolean premiumAccount;
+    private boolean deleted;
+
     private Long lastPasswordChangedAt;
     private Long lastLoginAt;
-    private boolean premiumAccount;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 

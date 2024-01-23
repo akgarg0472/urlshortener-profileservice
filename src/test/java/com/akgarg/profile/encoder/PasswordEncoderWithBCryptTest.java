@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestPasswordEncoderWithBCrypt {
+class PasswordEncoderWithBCryptTest {
 
     @Test
     void test_BcryptEncoding_WithDifferentHashingRoundsNumber() {

@@ -15,7 +15,7 @@ public final class ProfileUtils {
         final var requestId = httpRequest.getAttribute("requestId");
         return requestId != null ? requestId : System.nanoTime();
     }
-
+    
     public static void checkValidationResultAndThrowExceptionOnFailure(
             final BindingResult validationResult
     ) {

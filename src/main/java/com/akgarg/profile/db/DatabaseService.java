@@ -1,4 +1,4 @@
-package com.akgarg.profile.profile.v1.db;
+package com.akgarg.profile.db;
 
 import com.akgarg.profile.profile.v1.Profile;
 
