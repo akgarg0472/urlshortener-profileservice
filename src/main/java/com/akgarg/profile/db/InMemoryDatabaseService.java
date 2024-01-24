@@ -1,8 +1,6 @@
 package com.akgarg.profile.db;
 
 import com.akgarg.profile.profile.v1.Profile;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,8 +9,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryDatabaseService implements DatabaseService {
-
-    private static final Logger LOGGER = LogManager.getLogger(InMemoryDatabaseService.class);
 
     private static final String PROFILE_ID_CANT_NULL = "Profile id can't be null";
 
@@ -25,7 +21,8 @@ public class InMemoryDatabaseService implements DatabaseService {
     @Override
     public boolean addProfile(final Profile profile) {
         Objects.requireNonNull(profile, "Profile can't be null");
-        return db.putIfAbsent(profile.getId(), profile) == null;
+        return !isProfileExistsByEmail(profile.getEmail()) &&
+                db.putIfAbsent(profile.getId(), profile) == null;
     }
 
     @Override
@@ -70,6 +67,12 @@ public class InMemoryDatabaseService implements DatabaseService {
     @Override
     public Collection<Profile> findAllProfiles() {
         return db.values();
+    }
+
+    private boolean isProfileExistsByEmail(final String email) {
+        return db.values()
+                .stream()
+                .anyMatch(profile -> Objects.equals(profile.getEmail(), email));
     }
 
 }

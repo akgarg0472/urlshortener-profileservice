@@ -5,7 +5,6 @@ import com.akgarg.profile.request.UpdateProfileRequest;
 import com.akgarg.profile.response.DeleteResponse;
 import com.akgarg.profile.response.ProfileResponse;
 import com.akgarg.profile.response.UpdateResponse;
-import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,12 +17,12 @@ import java.util.Optional;
 import static com.akgarg.profile.utils.ProfileUtils.checkValidationResultAndThrowExceptionOnFailure;
 
 @RestController
-@RequestMapping("/api/v1/profiles")
+@RequestMapping("/api/v1/profile")
 public class ProfileController {
 
     private final ProfileService profileService;
 
-    public ProfileController(@Nonnull final ProfileService profileService) {
+    public ProfileController(final ProfileService profileService) {
         this.profileService = profileService;
     }
 

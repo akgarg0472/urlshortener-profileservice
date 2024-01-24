@@ -1,9 +1,9 @@
 package com.akgarg.profile.profile.v1;
 
+import com.akgarg.profile.db.DatabaseService;
 import com.akgarg.profile.exception.BadRequestException;
 import com.akgarg.profile.exception.ResourceNotFoundException;
 import com.akgarg.profile.notification.NotificationService;
-import com.akgarg.profile.db.DatabaseService;
 import com.akgarg.profile.request.UpdatePasswordRequest;
 import com.akgarg.profile.request.UpdateProfileRequest;
 import com.akgarg.profile.response.DeleteResponse;
@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static com.akgarg.profile.utils.ProfileUtils.extractRequestIdFromRequest;
@@ -71,6 +73,8 @@ public class ProfileService {
 
         LOGGER.info("[{}] Profile delete request for id={} received", requestId, profileId);
 
+        getProfileById(requestId, profileId);
+
         final boolean profileDeleted = databaseService.deleteProfileById(profileId);
 
         if (profileDeleted) {
@@ -86,6 +90,7 @@ public class ProfileService {
             @Nonnull final UpdateProfileRequest request
     ) {
         checkProfileId(profileId);
+        checkUpdateProfileRequestForAllNullValues(request);
 
         final var requestId = extractRequestIdFromRequest(httpRequest);
 
@@ -93,46 +98,80 @@ public class ProfileService {
 
         final Profile profile = getProfileById(requestId, profileId);
 
-        if (request.name() != null) {
-            profile.setName(request.name());
+        boolean isProfileUpdated = false;
+
+        if (isUpdateParamValid(request.name(), profile.getName())) {
+            profile.setName(request.name().trim());
+            isProfileUpdated = true;
         }
 
-        if (request.bio() != null) {
+        if (isUpdateParamValid(request.bio(), profile.getBio())) {
             profile.setBio(request.bio().trim());
+            isProfileUpdated = true;
         }
 
-        if (request.phone() != null) {
-            profile.setPhone(request.phone());
+        if (isUpdateParamValid(request.phone(), profile.getName())) {
+            profile.setPhone(request.phone().trim());
+            isProfileUpdated = true;
         }
 
-        if (request.city() != null) {
-            profile.setCity(request.city());
+        if (isUpdateParamValid(request.city(), profile.getCity())) {
+            profile.setCity(request.city().trim());
+            isProfileUpdated = true;
         }
 
-        if (request.state() != null) {
-            profile.setState(request.state());
+        if (isUpdateParamValid(request.state(), profile.getState())) {
+            profile.setState(request.state().trim());
+            isProfileUpdated = true;
         }
 
-        if (request.country() != null) {
-            profile.setCountry(request.country());
+        if (isUpdateParamValid(request.country(), profile.getCountry())) {
+            profile.setCountry(request.country().trim());
+            isProfileUpdated = true;
         }
 
-        if (request.zipcode() != null) {
-            profile.setZipcode(request.zipcode());
+        if (isUpdateParamValid(request.zipcode(), profile.getZipcode())) {
+            profile.setZipcode(request.zipcode().trim());
+            isProfileUpdated = true;
         }
 
-        if (request.businessDetails() != null) {
-            profile.setBusinessDetails(request.businessDetails());
+        if (isUpdateParamValid(request.businessDetails(), profile.getBusinessDetails())) {
+            profile.setBusinessDetails(request.businessDetails().trim());
+            isProfileUpdated = true;
         }
 
-        final boolean profileUpdated = databaseService.updateProfile(profile);
+        if (isProfileUpdated) {
+            final boolean profileUpdated = databaseService.updateProfile(profile);
 
-        if (!profileUpdated) {
-            LOGGER.error("[{}] profile update failed", requestId);
-            return UpdateResponse.internalServerError("Error updating profile. Try again later");
+            if (!profileUpdated) {
+                LOGGER.error("[{}] profile update failed", requestId);
+                return UpdateResponse.internalServerError("Error updating profile. Try again later");
+            }
+
+            return UpdateResponse.ok("Profile successfully updated");
         }
 
-        return UpdateResponse.ok("Profile successfully updated");
+        return UpdateResponse.ok("Profile unchanged because no updates were made");
+    }
+
+    private void checkUpdateProfileRequestForAllNullValues(final UpdateProfileRequest request) {
+        final Class<UpdateProfileRequest> requestClass = UpdateProfileRequest.class;
+        final Field[] fields = requestClass.getDeclaredFields();
+
+        final boolean allFieldsNull = Arrays.stream(fields)
+                .filter(field -> {
+                    try {
+                        field.trySetAccessible();
+                        return field.get(request) == null;
+                    } catch (IllegalAccessException e) {
+                        return true;
+                    }
+                })
+                .count() == fields.length;
+
+        if (allFieldsNull) {
+            throw new BadRequestException(new String[]{"All fields are null in request"}, "Invalid request");
+        }
     }
 
     public UpdateResponse updatePassword(
@@ -153,7 +192,7 @@ public class ProfileService {
 
         final Profile profile = getProfileById(requestId, profileId);
 
-        if (!matchPassword(profile.getPassword(), updatePasswordRequest.currentPassword())) {
+        if (!matchPassword(updatePasswordRequest.currentPassword(), profile.getPassword())) {
             LOGGER.warn("[{}] incorrect password provide", requestId);
             return UpdateResponse.badRequest("Incorrect current password");
         }
@@ -202,6 +241,10 @@ public class ProfileService {
         if (profileId == null || profileId.isBlank()) {
             throw new BadRequestException(new String[]{"Invalid profile id provided: " + profileId}, "Bad Request");
         }
+    }
+
+    private boolean isUpdateParamValid(final String reqParam, final String profileParam) {
+        return reqParam != null && !Objects.equal(reqParam, profileParam);
     }
 
 }

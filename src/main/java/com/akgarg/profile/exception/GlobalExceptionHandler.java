@@ -28,6 +28,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(final Exception e) {
+        e.printStackTrace();
         final ApiErrorResponse errorResponse = switch (e) {
             case HttpRequestMethodNotSupportedException ex ->
                     methodNotAllowedErrorResponse("Request HTTP method '" + ex.getMethod() + "' is not allowed. Allowed: " + Arrays.toString(ex.getSupportedMethods()));
@@ -36,6 +37,7 @@ public class GlobalExceptionHandler {
             case HttpMessageNotReadableException ex -> badRequestErrorResponse("Please provide valid request body");
             case NoResourceFoundException ex ->
                     resourceNotFoundErrorResponse("Requested resource not found: " + ex.getResourcePath());
+            case ResourceNotFoundException ex -> resourceNotFoundErrorResponse(ex.getMessage());
             default -> internalServerErrorResponse();
         };
 
