@@ -3,6 +3,7 @@ package com.akgarg.profile.profile.v1;
 import com.akgarg.profile.db.DatabaseService;
 import com.akgarg.profile.exception.BadRequestException;
 import com.akgarg.profile.exception.ResourceNotFoundException;
+import com.akgarg.profile.image.ImageService;
 import com.akgarg.profile.notification.NotificationService;
 import com.akgarg.profile.request.UpdatePasswordRequest;
 import com.akgarg.profile.request.UpdateProfileRequest;
@@ -31,14 +32,17 @@ public class ProfileService {
     private static final int PASSWORD_ENCODER_STRENGTH = 10;
 
     private final DatabaseService databaseService;
+    private final ImageService imageService;
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
 
     public ProfileService(
             @Nonnull final DatabaseService databaseService,
+            @Nonnull final ImageService imageService,
             @Nonnull final NotificationService notificationService
     ) {
         this.databaseService = databaseService;
+        this.imageService = imageService;
         this.notificationService = notificationService;
         this.passwordEncoder = new BCryptPasswordEncoder(PASSWORD_ENCODER_STRENGTH);
     }
@@ -78,6 +82,7 @@ public class ProfileService {
         final boolean profileDeleted = databaseService.deleteProfileById(profileId);
 
         if (profileDeleted) {
+            LOGGER.info("[{}] profile deleted successfully with id={}", requestId, profileId);
             return new DeleteResponse(HttpStatus.OK.value(), "Profile deleted successfully");
         }
 
@@ -100,43 +105,43 @@ public class ProfileService {
 
         boolean isProfileUpdated = false;
 
-        if (isUpdateParamValid(request.name(), profile.getName())) {
-            profile.setName(request.name().trim());
+        if (isUpdateParamValid(request.getName(), profile.getName())) {
+            profile.setName(request.getName().trim());
             isProfileUpdated = true;
         }
 
-        if (isUpdateParamValid(request.bio(), profile.getBio())) {
-            profile.setBio(request.bio().trim());
+        if (isUpdateParamValid(request.getBio(), profile.getBio())) {
+            profile.setBio(request.getBio().trim());
             isProfileUpdated = true;
         }
 
-        if (isUpdateParamValid(request.phone(), profile.getName())) {
-            profile.setPhone(request.phone().trim());
+        if (isUpdateParamValid(request.getPhone(), profile.getName())) {
+            profile.setPhone(request.getPhone().trim());
             isProfileUpdated = true;
         }
 
-        if (isUpdateParamValid(request.city(), profile.getCity())) {
-            profile.setCity(request.city().trim());
+        if (isUpdateParamValid(request.getCity(), profile.getCity())) {
+            profile.setCity(request.getCity().trim());
             isProfileUpdated = true;
         }
 
-        if (isUpdateParamValid(request.state(), profile.getState())) {
-            profile.setState(request.state().trim());
+        if (isUpdateParamValid(request.getState(), profile.getState())) {
+            profile.setState(request.getState().trim());
             isProfileUpdated = true;
         }
 
-        if (isUpdateParamValid(request.country(), profile.getCountry())) {
-            profile.setCountry(request.country().trim());
+        if (isUpdateParamValid(request.getCountry(), profile.getCountry())) {
+            profile.setCountry(request.getCountry().trim());
             isProfileUpdated = true;
         }
 
-        if (isUpdateParamValid(request.zipcode(), profile.getZipcode())) {
-            profile.setZipcode(request.zipcode().trim());
+        if (isUpdateParamValid(request.getZipcode(), profile.getZipcode())) {
+            profile.setZipcode(request.getZipcode().trim());
             isProfileUpdated = true;
         }
 
-        if (isUpdateParamValid(request.businessDetails(), profile.getBusinessDetails())) {
-            profile.setBusinessDetails(request.businessDetails().trim());
+        if (isUpdateParamValid(request.getBusinessDetails(), profile.getBusinessDetails())) {
+            profile.setBusinessDetails(request.getBusinessDetails().trim());
             isProfileUpdated = true;
         }
 
@@ -217,7 +222,7 @@ public class ProfileService {
     ) {
         return databaseService.findByProfileId(profileId)
                 .orElseThrow(() -> {
-                    LOGGER.warn("[{}] not profile found with id: {}", requestId, profileId);
+                    LOGGER.warn("[{}] profile not found with id: {}", requestId, profileId);
                     return new ResourceNotFoundException("Profile not found with id: " + profileId);
                 });
     }

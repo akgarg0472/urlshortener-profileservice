@@ -18,6 +18,7 @@ public class Profile {
     private String scopes;
     private String name;
     private String bio;
+    private String profilePictureUrl;
     private String phone;
     private String city;
     private String state;

@@ -7,6 +7,7 @@ public record ProfileDTO(
         @JsonProperty("username") String username,
         @JsonProperty("name") String name,
         @JsonProperty("bio") String bio,
+        @JsonProperty("profile_picture") String profilePictureUrl,
         @JsonProperty("phone") String phone,
         @JsonProperty("city") String city,
         @JsonProperty("country") String country,
@@ -19,6 +20,7 @@ public record ProfileDTO(
 
     public static ProfileDTO notFound() {
         return new ProfileDTO(
+                null,
                 null,
                 null,
                 null,
@@ -40,6 +42,7 @@ public record ProfileDTO(
                 profile.getUsername(),
                 profile.getName(),
                 profile.getBio(),
+                notFound().profilePictureUrl(),
                 profile.getPhone(),
                 profile.getCity(),
                 profile.getCountry(),
