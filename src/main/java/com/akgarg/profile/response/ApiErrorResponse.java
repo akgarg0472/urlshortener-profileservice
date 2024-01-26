@@ -33,7 +33,7 @@ public final class ApiErrorResponse {
     }
 
     public static ApiErrorResponse badRequestErrorResponse(final String message) {
-        return new ApiErrorResponse(new String[]{message}, BAD_REQUEST, "Unsupported media type");
+        return new ApiErrorResponse(new String[]{message}, BAD_REQUEST, "Invalid Request");
     }
 
     public static ApiErrorResponse resourceNotFoundErrorResponse(final String message) {

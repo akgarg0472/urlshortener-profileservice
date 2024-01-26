@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -103,49 +104,66 @@ public class ProfileService {
 
         final Profile profile = getProfileById(requestId, profileId);
 
-        boolean isProfileUpdated = false;
+        boolean isProfileDataUpdated = false;
+
+        if (isValidProfilePicture(request.getProfilePicture())) {
+            final var updatedProfilePictureUrl = imageService.uploadImage(request.getProfilePicture());
+            if (updatedProfilePictureUrl.isPresent()) {
+                isProfileDataUpdated = true;
+                LOGGER.info("[{}] profile picture uploaded successfully for profileId={}", requestId, profileId);
+                profile.setProfilePictureUrl(updatedProfilePictureUrl.get());
+            }
+        }
 
         if (isUpdateParamValid(request.getName(), profile.getName())) {
             profile.setName(request.getName().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile name updated", requestId);
         }
 
         if (isUpdateParamValid(request.getBio(), profile.getBio())) {
             profile.setBio(request.getBio().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile bio updated", requestId);
         }
 
-        if (isUpdateParamValid(request.getPhone(), profile.getName())) {
+        if (isUpdateParamValid(request.getPhone(), profile.getPhone())) {
             profile.setPhone(request.getPhone().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile phone updated", requestId);
         }
 
         if (isUpdateParamValid(request.getCity(), profile.getCity())) {
             profile.setCity(request.getCity().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile city updated", requestId);
         }
 
         if (isUpdateParamValid(request.getState(), profile.getState())) {
             profile.setState(request.getState().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile state updated", requestId);
         }
 
         if (isUpdateParamValid(request.getCountry(), profile.getCountry())) {
             profile.setCountry(request.getCountry().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile country updated", requestId);
         }
 
         if (isUpdateParamValid(request.getZipcode(), profile.getZipcode())) {
             profile.setZipcode(request.getZipcode().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile zipcode updated", requestId);
         }
 
         if (isUpdateParamValid(request.getBusinessDetails(), profile.getBusinessDetails())) {
             profile.setBusinessDetails(request.getBusinessDetails().trim());
-            isProfileUpdated = true;
+            isProfileDataUpdated = true;
+            LOGGER.debug("[{}] profile business details updated", requestId);
         }
 
-        if (isProfileUpdated) {
+        if (isProfileDataUpdated) {
             final boolean profileUpdated = databaseService.updateProfile(profile);
 
             if (!profileUpdated) {
@@ -153,10 +171,17 @@ public class ProfileService {
                 return UpdateResponse.internalServerError("Error updating profile. Try again later");
             }
 
+            LOGGER.info("[{}] profile updated successfully for id={}", requestId, profileId);
             return UpdateResponse.ok("Profile successfully updated");
         }
 
         return UpdateResponse.ok("Profile unchanged because no updates were made");
+    }
+
+    private boolean isValidProfilePicture(final MultipartFile profilePicture) {
+        if (profilePicture == null) return false;
+        final String contentType = profilePicture.getContentType();
+        return contentType != null && contentType.startsWith("image");
     }
 
     private void checkUpdateProfileRequestForAllNullValues(final UpdateProfileRequest request) {

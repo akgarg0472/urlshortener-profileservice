@@ -33,13 +33,12 @@ public class MysqlDatabaseService implements DatabaseService {
     public boolean addProfile(final Profile profile) {
         Objects.requireNonNull(profile, "Profile instance is null");
 
-        final String insertQuery = "INSERT INTO users (id, username, email, password, name, scopes) VALUES (?, ?, ?, ?, ?, ?);";
+        final String insertQuery = "INSERT INTO users (id, email, password, name, scopes) VALUES (?, ?, ?, ?, ?);";
 
         try {
             return jdbcTemplate.update(
                     insertQuery,
                     profile.getId(),
-                    profile.getUsername(),
                     profile.getEmail(),
                     profile.getPassword(),
                     profile.getName(),
@@ -60,7 +59,6 @@ public class MysqlDatabaseService implements DatabaseService {
         Objects.requireNonNull(profileId, PROFILE_ID_NULL_MSG);
 
         final String findByIdQuery = "SELECT * FROM users WHERE id = ?";
-
 
         try {
             final List<Profile> profile = jdbcTemplate.query(
@@ -83,22 +81,45 @@ public class MysqlDatabaseService implements DatabaseService {
     }
 
     @Override
-    public boolean updateProfile(final Profile profile) {
-        Objects.requireNonNull(profile, "Profile to update can't be null");
-        // TODO: add method implementation
-        return false;
+    public Collection<Profile> findAllProfiles() {
+        throw new UnsupportedOperationException("Fetching all profiles is not supported by the MySQL database service");
     }
 
     @Override
-    public boolean deleteProfileById(final String profileId) {
-        Objects.requireNonNull(profileId, PROFILE_ID_NULL_MSG);
+    public boolean updateProfile(final Profile profile) {
+        Objects.requireNonNull(profile, "Profile to update can't be null");
 
-        final String deleteProfileQuery = "UPDATE users SET is_deleted = true WHERE id = ?";
+        final String updateProfileQuery = """
+                UPDATE users
+                SET
+                name = ?,
+                bio = ?,
+                profile_picture_url = ?,
+                phone = ?,
+                city = ?,
+                state = ?,
+                country = ?,
+                zipcode = ?,
+                business_details = ?
+                WHERE id = ?;
+                """;
 
         try {
-            return jdbcTemplate.update(deleteProfileQuery, profileId) == 1;
+            return jdbcTemplate.update(
+                    updateProfileQuery,
+                    profile.getName(),
+                    profile.getBio(),
+                    profile.getProfilePictureUrl(),
+                    profile.getPhone(),
+                    profile.getCity(),
+                    profile.getState(),
+                    profile.getCountry(),
+                    profile.getZipcode(),
+                    profile.getBusinessDetails(),
+                    profile.getId()
+            ) == 1;
         } catch (Exception e) {
-            LOGGER.error("Error executing delete profile query", e);
+            LOGGER.error("Error executing update password query", e);
         }
 
         return false;
@@ -122,8 +143,18 @@ public class MysqlDatabaseService implements DatabaseService {
     }
 
     @Override
-    public Collection<Profile> findAllProfiles() {
-        throw new UnsupportedOperationException("Fetching all profiles is not supported by the MySQL database service");
+    public boolean deleteProfileById(final String profileId) {
+        Objects.requireNonNull(profileId, PROFILE_ID_NULL_MSG);
+
+        final String deleteProfileQuery = "UPDATE users SET is_deleted = true WHERE id = ?";
+
+        try {
+            return jdbcTemplate.update(deleteProfileQuery, profileId) == 1;
+        } catch (Exception e) {
+            LOGGER.error("Error executing delete profile query", e);
+        }
+
+        return false;
     }
 
     private boolean isDuplicateInsertionException(final Exception e) {
@@ -165,7 +196,7 @@ public class MysqlDatabaseService implements DatabaseService {
         public Profile mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
             final Profile profile = new Profile();
             profile.setId(resultSet.getString("id"));
-            profile.setUsername(resultSet.getString("username"));
+            profile.setProfilePictureUrl(resultSet.getString("profile_picture_url"));
             profile.setEmail(resultSet.getString("email"));
             profile.setPassword(resultSet.getString("password"));
             profile.setScopes(resultSet.getString("scopes"));

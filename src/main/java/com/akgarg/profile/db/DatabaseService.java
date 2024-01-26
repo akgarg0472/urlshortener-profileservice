@@ -11,12 +11,13 @@ public interface DatabaseService {
 
     Optional<Profile> findByProfileId(String profileId);
 
-    boolean updateProfile(Profile profile);
+    Collection<Profile> findAllProfiles();
 
-    boolean deleteProfileById(String profileId);
+    boolean updateProfile(Profile profile);
 
     boolean updatePassword(String profileId, String encryptedPassword);
 
-    Collection<Profile> findAllProfiles();
+    boolean deleteProfileById(String profileId);
+
 
 }

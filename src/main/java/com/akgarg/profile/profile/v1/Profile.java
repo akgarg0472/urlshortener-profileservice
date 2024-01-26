@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 public class Profile {
 
     private String id;
-    private String username;
     private String email;
     private String password;
     private String scopes;
@@ -41,10 +40,8 @@ public class Profile {
     public String toString() {
         return "Profile{" +
                 "id='" + id + '\'' +
-                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
-                ", password='" + password +
                 '}';
     }
 

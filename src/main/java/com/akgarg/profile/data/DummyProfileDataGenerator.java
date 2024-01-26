@@ -26,7 +26,6 @@ final class DummyProfileDataGenerator {
 
         for (int i = 1; i <= numberOfProfiles; i++) {
             final Profile profile = new Profile(String.valueOf(i));
-            profile.setUsername(faker.random().hex());
             profile.setEmail(faker.internet().emailAddress());
             profile.setPassword(passwordEncoder.encode(faker.internet().password()));
             profile.setScopes("user");

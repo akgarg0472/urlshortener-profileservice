@@ -3,6 +3,7 @@ package com.akgarg.profile.configs;
 import com.akgarg.profile.db.DatabaseService;
 import com.akgarg.profile.db.InMemoryDatabaseService;
 import com.akgarg.profile.db.MysqlDatabaseService;
+import com.akgarg.profile.image.CloudImageService;
 import com.akgarg.profile.image.ImageService;
 import com.akgarg.profile.image.LocalStorageImageService;
 import com.akgarg.profile.notification.KafkaNotificationService;
@@ -72,6 +73,12 @@ public class BeanConfigs {
     @Bean("imageService")
     public ImageService localStorageImageService() {
         return new LocalStorageImageService();
+    }
+
+    @Profile("prod")
+    @Bean("imageService")
+    public ImageService cloudImageService() {
+        return new CloudImageService();
     }
 
 }
