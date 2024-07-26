@@ -26,8 +26,7 @@ public class KafkaNotificationService extends AbstractNotificationService {
     @Override
     public void publishEvent(final NotificationEvent notificationEvent) {
         serializeEvent(notificationEvent)
-                .ifPresent(eventJson -> kafkaTemplate.send(notificationTopicName, eventJson)
-                        .whenComplete((s1, s2) -> LOGGER.info("{} : {}", s1, s2)));
+                .ifPresent(eventJson -> kafkaTemplate.send(notificationTopicName, eventJson));
     }
 
     private Optional<String> serializeEvent(final NotificationEvent notificationEvent) {

@@ -3,54 +3,45 @@ package com.akgarg.profile.notification;
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class NotificationEvent {
+public record NotificationEvent(String[] recipients, String name, String subject, String body, boolean isHtml,
+                                NotificationType notificationType) {
 
-    private final String[] recipients;
-    private final String subject;
-    private final String body;
-    private final boolean isHtml;
-    private final NotificationType notificationType;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
 
-    NotificationEvent(
-            String[] recipients,
-            String subject,
-            String body,
-            boolean isHtml,
-            NotificationType notificationType
-    ) {
-        this.recipients = recipients;
-        this.subject = subject;
-        this.body = body;
-        this.isHtml = isHtml;
-        this.notificationType = notificationType;
+        if (o instanceof final NotificationEvent event) {
+            return isHtml == event.isHtml &&
+                    Objects.equals(name, event.name) &&
+                    Objects.equals(body, event.body) &&
+                    Objects.equals(subject, event.subject) &&
+                    Arrays.equals(recipients, event.recipients) &&
+                    notificationType == event.notificationType;
+        }
+
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Arrays.hashCode(recipients), subject, body, isHtml, notificationType);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (NotificationEvent) obj;
-        return Arrays.equals(this.recipients, that.recipients) &&
-                Objects.equals(this.subject, that.subject) &&
-                Objects.equals(this.body, that.body) &&
-                this.isHtml == that.isHtml &&
-                Objects.equals(this.notificationType, that.notificationType);
+        int result = Arrays.hashCode(recipients);
+        result = 31 * result + Objects.hashCode(name);
+        result = 31 * result + Objects.hashCode(subject);
+        result = 31 * result + Objects.hashCode(body);
+        result = 31 * result + Boolean.hashCode(isHtml());
+        result = 31 * result + Objects.hashCode(notificationType);
+        return result;
     }
 
     @Override
     public String toString() {
-        return "NotificationEvent[" +
-                "recipients=" + Arrays.toString(recipients) + ", " +
-                "subject=" + subject + ", " +
-                "body=" + body + ", " +
-                "isHtml=" + isHtml + ", " +
-                "notificationType=" + notificationType + ']';
+        return "NotificationEvent{" +
+                "recipients=" + Arrays.toString(recipients) +
+                ", name='" + name + '\'' +
+                ", subject='" + subject + '\'' +
+                ", body='" + body + '\'' +
+                ", isHtml=" + isHtml +
+                ", notificationType=" + notificationType +
+                '}';
     }
-
-
 }

@@ -15,6 +15,6 @@ eureka:
 kafka:
   notification:
     topic:
-      name: urlshortener.notifications
+      name: urlshortener.notifications.email
       partitions: 1
       replication-factor: 1

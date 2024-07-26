@@ -10,7 +10,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication(exclude = {JdbcTemplateAutoConfiguration.class, DataSourceAutoConfiguration.class})
 public class ProfileMicroservice {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(ProfileMicroservice.class, args);
     }
 

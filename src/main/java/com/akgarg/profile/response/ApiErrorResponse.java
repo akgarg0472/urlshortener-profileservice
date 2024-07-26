@@ -16,6 +16,7 @@ public final class ApiErrorResponse {
     @JsonProperty("status_code")
     private final int errorCode;
 
+    @JsonProperty("error_message")
     private final String message;
 
     private ApiErrorResponse(final String[] errors, final ApiErrorType errorType, String message) {

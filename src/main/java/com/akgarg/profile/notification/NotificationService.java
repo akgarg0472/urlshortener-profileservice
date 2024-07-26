@@ -4,6 +4,6 @@ public interface NotificationService {
 
     void publishEvent(NotificationEvent notificationEvent);
 
-    void sendPasswordChangedSuccessEmail(String email);
+    void sendPasswordChangedSuccessEmail(String email, final String name);
 
 }

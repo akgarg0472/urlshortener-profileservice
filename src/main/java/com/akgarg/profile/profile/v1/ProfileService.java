@@ -9,7 +9,6 @@ import com.akgarg.profile.request.UpdatePasswordRequest;
 import com.akgarg.profile.request.UpdateProfileRequest;
 import com.akgarg.profile.response.DeleteResponse;
 import com.akgarg.profile.response.UpdateResponse;
-import com.google.common.base.Objects;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.akgarg.profile.utils.ProfileUtils.extractRequestIdFromRequest;
@@ -223,7 +223,7 @@ public class ProfileService {
         final Profile profile = getProfileById(requestId, profileId);
 
         if (!matchPassword(updatePasswordRequest.currentPassword(), profile.getPassword())) {
-            LOGGER.warn("[{}] incorrect password provide", requestId);
+            LOGGER.warn("[{}] incorrect password provided", requestId);
             return UpdateResponse.badRequest("Incorrect current password");
         }
 
@@ -237,7 +237,7 @@ public class ProfileService {
         }
 
         LOGGER.info("[{}] password updated successfully", requestId);
-        notificationService.sendPasswordChangedSuccessEmail(profile.getEmail());
+        notificationService.sendPasswordChangedSuccessEmail(profile.getEmail(), profile.getName());
         return UpdateResponse.ok("Password updated successfully");
     }
 
@@ -253,7 +253,7 @@ public class ProfileService {
     }
 
     private boolean arePasswordsEqual(@Nonnull final UpdatePasswordRequest request) {
-        return Objects.equal(request.newPassword(), request.confirmPassword());
+        return Objects.equals(request.newPassword(), request.confirmPassword());
     }
 
     private String encryptPassword(@Nonnull final String rawPassword) {
@@ -274,7 +274,7 @@ public class ProfileService {
     }
 
     private boolean isUpdateParamValid(final String reqParam, final String profileParam) {
-        return reqParam != null && !Objects.equal(reqParam, profileParam);
+        return reqParam != null && !Objects.equals(reqParam, profileParam);
     }
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record ProfileDTO(
         @JsonProperty("id") String id,
+        @JsonProperty("email") String email,
         @JsonProperty("name") String name,
         @JsonProperty("bio") String bio,
         @JsonProperty("profile_picture") String profilePictureUrl,
@@ -31,6 +32,7 @@ public record ProfileDTO(
                 null,
                 null,
                 null,
+                null,
                 -1,
                 -1,
                 false,
@@ -43,6 +45,7 @@ public record ProfileDTO(
     public static ProfileDTO fromProfile(final Profile profile) {
         return new ProfileDTO(
                 profile.getId(),
+                profile.getEmail(),
                 profile.getName(),
                 profile.getBio(),
                 profile.getProfilePictureUrl(),
