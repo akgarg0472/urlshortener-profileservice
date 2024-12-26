@@ -41,8 +41,8 @@ final class DummyProfileDataGenerator {
             final Date date = faker.date().past(225 * 24, TimeUnit.HOURS);
             profile.setLastPasswordChangedAt(date.getTime());
             profile.setLastLoginAt(faker.date().past(1, TimeUnit.HOURS).getTime());
-            profile.setCreatedAt(Timestamp.from(Instant.ofEpochMilli(date.getTime() - (90L * 24 * 60 * 60 * 1000))));
-            profile.setUpdatedAt(Timestamp.from(Instant.ofEpochMilli(faker.date().past(41, TimeUnit.DAYS).getTime())));
+            profile.setCreatedAt(Timestamp.from(Instant.ofEpochMilli(date.getTime() - (90L * 24 * 60 * 60 * 1000))).getTime());
+            profile.setUpdatedAt(Timestamp.from(Instant.ofEpochMilli(faker.date().past(41, TimeUnit.DAYS).getTime())).getTime());
             profiles.add(profile);
         }
 

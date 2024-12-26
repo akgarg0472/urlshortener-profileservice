@@ -73,7 +73,7 @@ public class DatabaseTestUtil {
         profile.setId(profileId);
         profile.setEmail(faker.internet().emailAddress());
         profile.setPassword(faker.random().toString());
-        profile.setUsername(faker.internet().uuid().substring(0, 8));
+//        profile.setUsername(faker.internet().uuid().substring(0, 8));
         profile.setName(faker.name().name());
         profile.setScopes("test");
         return profile;

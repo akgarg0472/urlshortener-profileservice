@@ -58,8 +58,8 @@ public record ProfileDTO(
                 profile.getLastPasswordChangedAt(),
                 profile.isPremiumAccount(),
                 profile.getBusinessDetails(),
-                profile.getCreatedAt().getTime(),
-                profile.getUpdatedAt().getTime()
+                profile.getCreatedAt(),
+                profile.getUpdatedAt()
         );
     }
 

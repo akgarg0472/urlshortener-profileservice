@@ -3,20 +3,27 @@ package com.akgarg.profile.notification;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record NotificationEvent(String[] recipients, String name, String subject, String body, boolean isHtml,
-                                NotificationType notificationType) {
+public record NotificationEvent(
+        String[] recipients,
+        String name,
+        String subject,
+        String body,
+        boolean isHtml,
+        NotificationType notificationType) {
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
 
-        if (o instanceof final NotificationEvent event) {
-            return isHtml == event.isHtml &&
-                    Objects.equals(name, event.name) &&
-                    Objects.equals(body, event.body) &&
-                    Objects.equals(subject, event.subject) &&
-                    Arrays.equals(recipients, event.recipients) &&
-                    notificationType == event.notificationType;
+        if (o instanceof NotificationEvent(
+                String[] recipients1, String name1, String subject1, String body1, boolean html, NotificationType type
+        )) {
+            return isHtml == html &&
+                    Objects.equals(name, name1) &&
+                    Objects.equals(body, body1) &&
+                    Objects.equals(subject, subject1) &&
+                    Arrays.equals(recipients, recipients1) &&
+                    notificationType == type;
         }
 
         return false;

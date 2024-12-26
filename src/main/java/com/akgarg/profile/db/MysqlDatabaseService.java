@@ -75,9 +75,8 @@ public class MysqlDatabaseService implements DatabaseService {
 
         } catch (Exception e) {
             LOGGER.error("Error executing find by id query", e);
+            throw new DatabaseException(e.getMessage(), 500);
         }
-
-        return Optional.empty();
     }
 
     @Override
@@ -212,8 +211,8 @@ public class MysqlDatabaseService implements DatabaseService {
             profile.setDeleted(resultSet.getBoolean("is_deleted"));
             profile.setLastPasswordChangedAt(resultSet.getLong("last_password_changed_at"));
             profile.setLastLoginAt(resultSet.getLong("last_login_at"));
-            profile.setCreatedAt(resultSet.getTimestamp("created_at"));
-            profile.setUpdatedAt(resultSet.getTimestamp("updated_at"));
+            profile.setCreatedAt(resultSet.getLong("created_at"));
+            profile.setUpdatedAt(resultSet.getLong("updated_at"));
             return profile;
         }
     }

@@ -1,7 +1,6 @@
 package com.akgarg.profile.image;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,21 +12,26 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 public class LocalStorageImageService extends AbstractImageService implements InitializingBean {
 
-    private static final Logger LOGGER = LogManager.getLogger(LocalStorageImageService.class);
-    private static final String IMAGE_DIRECTORY = "C:" + File.separator + "tmp" + File.separator + "profile-pictures";
+    private static final String TMP_IMAGE_DIR = File.separator +
+            "tmp" + File.separator +
+            "urlshortener" + File.separator +
+            "profile-pictures";
 
     @Override
-    public void afterPropertiesSet() {
+    public void afterPropertiesSet() throws IOException {
         try {
-            final Path path = Path.of(IMAGE_DIRECTORY);
+            final Path path = Path.of(TMP_IMAGE_DIR);
 
             if (!Files.exists(path)) {
-                Files.createDirectory(path);
+                log.info("Creating temporary image directory: {}", TMP_IMAGE_DIR);
+                Files.createDirectories(path);
             }
         } catch (Exception e) {
-            LOGGER.error("Error creating base directory to store profile pictures", e);
+            log.error("Error creating base directory to store profile pictures", e);
+            throw e;
         }
     }
 
@@ -38,29 +42,29 @@ public class LocalStorageImageService extends AbstractImageService implements In
         try {
             final String imageId = generateImageId(image);
             final String fileExtension = extractFileExtension(Objects.requireNonNull(image.getOriginalFilename()));
-            final String fileName = IMAGE_DIRECTORY + File.separator + imageId + "." + fileExtension;
+            final String fileName = TMP_IMAGE_DIR + File.separator + imageId + "." + fileExtension;
             final File convertedFile = convertMultipartFileToFile(image, fileName);
             storeFile(convertedFile);
             return Optional.of(convertedFile.getAbsolutePath());
         } catch (IOException e) {
-            LOGGER.error("Error storing image: {}", e.getMessage());
+            log.error("Error storing image: {}", e.getMessage());
             return Optional.empty();
         }
     }
 
     @Override
     public void deleteImage(final String imageUrl) {
-        final Path path = Path.of(IMAGE_DIRECTORY + File.separator + imageUrl);
+        final Path path = Path.of(TMP_IMAGE_DIR + File.separator + imageUrl);
         try {
             final boolean fileDeleted = Files.deleteIfExists(path);
-            LOGGER.info("Image file with id={} delete result: {}", imageUrl, fileDeleted);
+            log.info("Image file with id={} delete result: {}", imageUrl, fileDeleted);
         } catch (IOException e) {
-            LOGGER.error("Error deleting image with id: {}", imageUrl);
+            log.error("Error deleting image with id: {}", imageUrl);
         }
     }
 
     private void storeFile(final File file) throws IOException {
-        final Path destinationPath = Path.of(IMAGE_DIRECTORY, file.getName());
+        final Path destinationPath = Path.of(TMP_IMAGE_DIR, file.getName());
         Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
     }
 

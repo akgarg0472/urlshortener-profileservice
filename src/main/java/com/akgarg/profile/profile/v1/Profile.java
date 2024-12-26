@@ -29,8 +29,8 @@ public class Profile {
     private boolean deleted;
     private Long lastPasswordChangedAt;
     private Long lastLoginAt;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private Long createdAt;
+    private Long updatedAt;
 
     public Profile(final String id) {
         this.id = id;
