@@ -213,7 +213,9 @@ If you prefer to run the application locally without Docker, use the following M
 This will start the application on the default port `8566`. If you'd like to customize the port, you can set the
 `server.port` property in `application.yml` or override it via environment variables.
 
-### API Documentation
+---
+
+## API Documentation
 
 The **API Documentation** for the URL Shortener Profile Service is automatically generated using **Springdoc OpenAPI**
 and can be accessed at the following endpoints:
@@ -240,6 +242,8 @@ Replace `<host>` and `<port>` with your application's host and port. For example
 
 The Swagger UI provides detailed information about the available endpoints, including request and response formats,
 sample payloads, and error codes, making it easy for developers to integrate with the service.
+
+---
 
 ## Additional Notes
 
