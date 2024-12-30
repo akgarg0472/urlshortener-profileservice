@@ -13,6 +13,7 @@
     - [application-prod.yml](#application-prodyml)
 - [Docker Setup](#docker-setup)
 - [Running the Application](#running-the-application)
+- [API Documentation](#api-documentation)
 - [Additional Notes](#additional-notes)
 
 ---
@@ -212,13 +213,40 @@ If you prefer to run the application locally without Docker, use the following M
 This will start the application on the default port `8566`. If you'd like to customize the port, you can set the
 `server.port` property in `application.yml` or override it via environment variables.
 
+### API Documentation
+
+The **API Documentation** for the URL Shortener Profile Service is automatically generated using **Springdoc OpenAPI**
+and can be accessed at the following endpoints:
+
+1. **OpenAPI Specification**: Available at:
+
+    ```text
+    http://<host>:<port>/api-docs
+    ```
+
+   This provides the raw OpenAPI specification in JSON format, which can be used for integrations or importing into API
+   tools.
+
+2. **Swagger UI**: The user-friendly API documentation is accessible at:
+
+    ```text
+    http://<host>:<port>/docs
+    ```
+
+Replace `<host>` and `<port>` with your application's host and port. For example, if running locally:
+
+- OpenAPI Specification: [http://localhost:8566/api-docs](http://localhost:8566/api-docs)
+- Swagger UI: [http://localhost:8566/docs](http://localhost:8566/docs)
+
+The Swagger UI provides detailed information about the available endpoints, including request and response formats,
+sample payloads, and error codes, making it easy for developers to integrate with the service.
+
 ## Additional Notes
 
-- **MySQL Connectivity Issues**: Ensure your MySQL service is up and running, and that the database URL, username, and
+- *MySQL Connectivity Issues*: Ensure your MySQL service is up and running, and that the database URL, username, and
   password are correctly set. If you’re using Dockerized MySQL, make sure both the database container and the app
   container are on the same network.
-- **Profiles**: The active Spring profile (`SPRING_PROFILES_ACTIVE`) can be overridden via the `-e` flag during Docker
-  container runtime or through environment variables locally. Make sure to use `prod` profile unless unit testing.
-- **Port Conflicts**: If port `8566` is already in use, you can override it by setting `server.port` in the environment
-  or in the `application.yml`.
-
+- *Profiles*: The active Spring profile (SPRING_PROFILES_ACTIVE) can be overridden via the -e flag during Docker
+  container runtime or through environment variables locally. Make sure to use prod profile unless unit testing.
+- *Port Conflicts*: If port 8566 is already in use, you can override it by setting server.port in the environment
+  or in the application.yml.
