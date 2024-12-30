@@ -16,8 +16,6 @@
 - [API Documentation](#api-documentation)
 - [Additional Notes](#additional-notes)
 
----
-
 ## Introduction
 
 The **URL Shortener Profile Service** is designed to shorten long URLs and store associated profile data for users. This
@@ -32,8 +30,6 @@ Before running the project, ensure you have the following installed:
 - **Java 21+** (JDK)
 - **Maven**
 - **Docker**
-
----
 
 ## Installation
 
@@ -166,8 +162,6 @@ runtime, especially useful when running in Docker containers.
 > Note: If you're using the `prod` profile, make sure to define the `CLOUDINARY_URL` environment variable, or the
 > application will fail to start.
 
----
-
 ## Docker Setup
 
 The project is Dockerized for easy deployment. The `Dockerfile` is already configured to build and run the Spring Boot
@@ -211,8 +205,6 @@ If you prefer to run the application locally without Docker, use the following M
 This will start the application on the default port `8566`. If you'd like to customize the port, you can set the
 `server.port` property in `application.yml` or override it via environment variables.
 
----
-
 ## API Documentation
 
 The **API Documentation** for the URL Shortener Profile Service is automatically generated using **Springdoc OpenAPI**
@@ -240,8 +232,6 @@ Replace `<host>` and `<port>` with your application's host and port. For example
 
 The Swagger UI provides detailed information about the available endpoints, including request and response formats,
 sample payloads, and error codes, making it easy for developers to integrate with the service.
-
----
 
 ## Additional Notes
 
