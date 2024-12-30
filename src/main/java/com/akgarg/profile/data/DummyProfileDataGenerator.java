@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +24,7 @@ final class DummyProfileDataGenerator {
         final List<Profile> profiles = new ArrayList<>();
 
         for (int i = 1; i <= numberOfProfiles; i++) {
-            final Profile profile = new Profile(String.valueOf(i));
+            final var profile = new Profile(String.valueOf(i));
             profile.setEmail(faker.internet().emailAddress());
             profile.setPassword(passwordEncoder.encode(faker.internet().password()));
             profile.setScopes("user");
@@ -38,7 +37,7 @@ final class DummyProfileDataGenerator {
             profile.setZipcode(faker.address().zipCode());
             profile.setPremiumAccount(faker.bool().bool());
             profile.setDeleted(false);
-            final Date date = faker.date().past(225 * 24, TimeUnit.HOURS);
+            final var date = faker.date().past(225 * 24, TimeUnit.HOURS);
             profile.setLastPasswordChangedAt(date.getTime());
             profile.setLastLoginAt(faker.date().past(1, TimeUnit.HOURS).getTime());
             profile.setCreatedAt(Timestamp.from(Instant.ofEpochMilli(date.getTime() - (90L * 24 * 60 * 60 * 1000))).getTime());

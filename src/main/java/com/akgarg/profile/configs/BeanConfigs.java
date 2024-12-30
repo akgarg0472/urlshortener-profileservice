@@ -3,21 +3,18 @@ package com.akgarg.profile.configs;
 import com.akgarg.profile.db.DatabaseService;
 import com.akgarg.profile.db.InMemoryDatabaseService;
 import com.akgarg.profile.db.MysqlDatabaseService;
-import com.akgarg.profile.image.CloudImageService;
+import com.akgarg.profile.db.repo.ProfileRepository;
+import com.akgarg.profile.image.CloudinaryImageService;
 import com.akgarg.profile.image.ImageService;
 import com.akgarg.profile.image.LocalStorageImageService;
 import com.akgarg.profile.notification.KafkaNotificationService;
 import com.akgarg.profile.notification.NotificationService;
 import com.akgarg.profile.notification.VoidNotificationService;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import java.util.Properties;
 
 @Configuration
 public class BeanConfigs {
@@ -30,31 +27,8 @@ public class BeanConfigs {
 
     @Profile("prod")
     @Bean("databaseService")
-    public DatabaseService mysqlDatabaseService(final JdbcTemplate jdbcTemplate) {
-        return new MysqlDatabaseService(jdbcTemplate);
-    }
-
-    @Profile("prod")
-    @Bean("jdbcTemplate")
-    public JdbcTemplate jdbcTemplate() {
-        final Properties properties = new HikariConfig("/hikari.properties")
-                .getDataSourceProperties();
-
-        final HikariDataSource datasource = new HikariDataSource();
-        datasource.setDriverClassName(properties.getProperty("driverClassName"));
-        datasource.setJdbcUrl(properties.getProperty("jdbcUrl"));
-        datasource.setUsername(properties.getProperty("username"));
-        datasource.setPassword(properties.getProperty("password"));
-        datasource.setPoolName(properties.getProperty("poolName"));
-        datasource.setMaximumPoolSize(Integer.parseInt(properties.getProperty("maxPoolSize")));
-        datasource.setMinimumIdle(Integer.parseInt(properties.getProperty("minIdle")));
-        datasource.setMaxLifetime(Long.parseLong(properties.getProperty("maxLifetime")));
-        datasource.setConnectionTimeout(Long.parseLong(properties.getProperty("connectionTimeout")));
-        datasource.setIdleTimeout(Long.parseLong(properties.getProperty("idleTimeout")));
-        datasource.setLeakDetectionThreshold(Long.parseLong(properties.getProperty("leakDetectionThreshold")));
-        datasource.setConnectionTestQuery(properties.getProperty("connectionTestQuery"));
-
-        return new JdbcTemplate(datasource);
+    public DatabaseService mysqlDatabaseService(final ProfileRepository profileRepository) {
+        return new MysqlDatabaseService(profileRepository);
     }
 
     @Profile("dev")
@@ -77,8 +51,8 @@ public class BeanConfigs {
 
     @Profile("prod")
     @Bean("imageService")
-    public ImageService cloudImageService() {
-        return new CloudImageService();
+    public ImageService cloudImageService(final Environment environment) {
+        return new CloudinaryImageService(environment);
     }
 
 }

@@ -1,7 +1,9 @@
 package com.akgarg.profile.image;
 
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,13 +16,19 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class CloudImageServiceTest {
+class CloudinaryImageServiceTest {
 
-    private CloudImageService imageService;
+    private CloudinaryImageService imageService;
 
     @BeforeEach
     void setUp() {
-        imageService = new CloudImageService();
+        final var environment = new AbstractEnvironment() {
+            @Override
+            public String getProperty(@Nonnull final String key) {
+                return super.getProperty(key);
+            }
+        };
+        imageService = new CloudinaryImageService(environment);
     }
 
     @Test
@@ -30,7 +38,7 @@ class CloudImageServiceTest {
         final MultipartFile image = getImage();
         assertNotNull(image, "Image file to upload is null");
 
-        final Optional<String> uploadImageUrl = imageService.uploadImage(image);
+        final Optional<String> uploadImageUrl = imageService.uploadImage(null, image);
         assertThat(uploadImageUrl).isNotEmpty();
     }
 

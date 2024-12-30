@@ -14,11 +14,11 @@ public record ProfileDTO(
         @JsonProperty("country") String country,
         @JsonProperty("zipcode") String zipcode,
         @JsonProperty("last_login") long lastLoginAt,
-        @JsonProperty("last_password_changed") long lastPasswordChangedAt,
+        @JsonProperty("last_password_changed") Long lastPasswordChangedAt,
         @JsonProperty("premium_account") boolean premiumAccount,
         @JsonProperty("business_details") String businessDetails,
         @JsonProperty("created_at") long createdAt,
-        @JsonProperty("updated_at") long updatedAt
+        @JsonProperty("updated_at") Long updatedAt
 ) {
 
     public static ProfileDTO notFound() {
@@ -34,11 +34,11 @@ public record ProfileDTO(
                 null,
                 null,
                 -1,
-                -1,
+                -1L,
                 false,
                 null,
                 -1,
-                -1
+                -1L
         );
     }
 

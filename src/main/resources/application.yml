@@ -1,8 +1,6 @@
 spring:
   application:
     name: urlshortener-profile-service
-  profiles:
-    active: prod
   kafka:
     bootstrap-servers: localhost:9092
 

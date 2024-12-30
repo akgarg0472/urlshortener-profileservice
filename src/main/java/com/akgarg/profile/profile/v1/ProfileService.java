@@ -19,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -102,16 +101,19 @@ public class ProfileService {
 
         LOGGER.info("[{}] Profile update request for id={} received: {}", requestId, profileId, request);
 
-        final Profile profile = getProfileById(requestId, profileId);
+        final var profile = getProfileById(requestId, profileId);
 
         boolean isProfileDataUpdated = false;
 
         if (isValidProfilePicture(request.getProfilePicture())) {
-            final var updatedProfilePictureUrl = imageService.uploadImage(request.getProfilePicture());
+            final var updatedProfilePictureUrl = imageService.uploadImage(requestId, request.getProfilePicture());
+            final var previousProfilePicture = profile.getProfilePictureUrl();
+
             if (updatedProfilePictureUrl.isPresent()) {
                 isProfileDataUpdated = true;
                 LOGGER.info("[{}] profile picture uploaded successfully for profileId={}", requestId, profileId);
                 profile.setProfilePictureUrl(updatedProfilePictureUrl.get());
+                imageService.deleteImage(requestId, previousProfilePicture);
             }
         }
 
@@ -164,7 +166,7 @@ public class ProfileService {
         }
 
         if (isProfileDataUpdated) {
-            final boolean profileUpdated = databaseService.updateProfile(profile);
+            final var profileUpdated = databaseService.updateProfile(profile);
 
             if (!profileUpdated) {
                 LOGGER.error("[{}] profile update failed", requestId);
@@ -185,8 +187,8 @@ public class ProfileService {
     }
 
     private void checkUpdateProfileRequestForAllNullValues(final UpdateProfileRequest request) {
-        final Class<UpdateProfileRequest> requestClass = UpdateProfileRequest.class;
-        final Field[] fields = requestClass.getDeclaredFields();
+        final var requestClass = UpdateProfileRequest.class;
+        final var fields = requestClass.getDeclaredFields();
 
         final boolean allFieldsNull = Arrays.stream(fields)
                 .filter(field -> {
@@ -220,7 +222,7 @@ public class ProfileService {
             return UpdateResponse.badRequest("New password and confirm password mismatched");
         }
 
-        final Profile profile = getProfileById(requestId, profileId);
+        final var profile = getProfileById(requestId, profileId);
 
         if (!matchPassword(updatePasswordRequest.currentPassword(), profile.getPassword())) {
             LOGGER.warn("[{}] incorrect password provided", requestId);
@@ -228,8 +230,7 @@ public class ProfileService {
         }
 
         final var encryptedPassword = encryptPassword(updatePasswordRequest.newPassword());
-
-        final boolean isPasswordUpdated = databaseService.updatePassword(profileId, encryptedPassword);
+        final var isPasswordUpdated = databaseService.updatePassword(profileId, encryptedPassword);
 
         if (!isPasswordUpdated) {
             LOGGER.error("[{}] password update failed", requestId);

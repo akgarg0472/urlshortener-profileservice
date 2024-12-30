@@ -10,19 +10,19 @@ import java.util.UUID;
 abstract class AbstractImageService implements ImageService {
 
     public String generateImageId(final MultipartFile image) {
-        final int imageHash = Objects.hash(image);
-        final int randomStringHash = Objects.hash(UUID.randomUUID().toString());
-        return "" + System.currentTimeMillis() + Math.abs(imageHash) + Math.abs(randomStringHash);
+        final var imageHash = Objects.hash(image);
+        final var randomStringHash = Objects.hash(UUID.randomUUID().toString());
+        return Math.abs(randomStringHash) + "" + System.nanoTime() + Math.abs(imageHash);
     }
 
     public File convertMultipartFileToFile(final MultipartFile file, final String fileName) throws IOException {
-        final File convertedFile = new File(fileName);
+        final var convertedFile = new File(fileName);
         file.transferTo(convertedFile);
         return convertedFile;
     }
 
     protected String extractFileExtension(final String originalFileName) {
-        int lastDotIndex = originalFileName.lastIndexOf('.');
+        final var lastDotIndex = originalFileName.lastIndexOf('.');
         if (lastDotIndex != -1) {
             return originalFileName.substring(lastDotIndex + 1);
         }
