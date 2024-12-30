@@ -52,8 +52,6 @@ To build the application locally, use Maven to compile the project and generate 
 
 This will compile the application and generate the executable `.jar` file in the `target` directory.
 
----
-
 ## Configuration
 
 The application uses two main configuration files: `application.yml` for general Spring Boot settings and
