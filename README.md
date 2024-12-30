@@ -25,8 +25,6 @@ service enables users to manage their profiles while also shortening URLs for qu
 Boot** and **JPA** for database interaction, and the application supports **MySQL** as the database. It is also
 Dockerized to make the deployment process smooth and scalable.
 
----
-
 ## Prerequisites
 
 Before running the project, ensure you have the following installed:
