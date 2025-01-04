@@ -1,7 +1,7 @@
 # URL Shortener Profile Service
 
 ![Java Version](https://img.shields.io/badge/Java-21-blue)
-![version](https://img.shields.io/badge/version-1.0.0-blue)
+![version](https://img.shields.io/badge/version-1.0.1-blue)
 
 ## Table of Contents
 
@@ -132,6 +132,21 @@ kafka:
 - **JPA Settings**: Configures Hibernate and JPA behavior (e.g., ddl-auto: update).
 - **Hikari Connection Pool**: Connection pool settings for optimal database performance.
 - **Kafka Notification Topic**: Defines Kafka topic settings for email notifications.
+
+## Logging Configuration
+
+The URL Shortener Service uses environment variables for logging configuration. Here are the available environment
+variables that you can customize for logging:
+
+- **LOG_LEVEL**: Specifies the log level for the application (e.g., `INFO`, `DEBUG`, `WARN`).
+    - Default value: `INFO`
+
+- **LOG_PATH**: Specifies the base path for log files.
+    - Default value: `/tmp/logs/profile`
+
+- **LOGGER_REF**: Specifies the appender reference to use for logging.
+    - Default value: `consoleLogger`
+    - Allowed values: `consoleLogger`, `fileLogger`
 
 ### Environment Variables
 

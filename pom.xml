@@ -12,7 +12,7 @@
 
     <groupId>com.akgarg</groupId>
     <artifactId>urlshortener-profile-service</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>urlshortener-profile-service</name>
     <description>Urlshortener Profile Service</description>
 
