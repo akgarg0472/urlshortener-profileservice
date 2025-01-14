@@ -35,7 +35,6 @@ final class DummyProfileDataGenerator {
             profile.setState(faker.address().state());
             profile.setCountry(faker.address().country());
             profile.setZipcode(faker.address().zipCode());
-            profile.setPremiumAccount(faker.bool().bool());
             profile.setDeleted(false);
             final var date = faker.date().past(225 * 24, TimeUnit.HOURS);
             profile.setLastPasswordChangedAt(date.getTime());

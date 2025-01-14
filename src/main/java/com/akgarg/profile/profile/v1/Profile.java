@@ -59,9 +59,6 @@ public class Profile {
     @Column(name = "forgot_password_token")
     private String forgotPasswordToken;
 
-    @Column(name = "premium_account", nullable = false)
-    private boolean premiumAccount;
-
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
 

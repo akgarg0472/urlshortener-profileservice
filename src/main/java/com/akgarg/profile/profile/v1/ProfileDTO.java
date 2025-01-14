@@ -15,32 +15,10 @@ public record ProfileDTO(
         @JsonProperty("zipcode") String zipcode,
         @JsonProperty("last_login") long lastLoginAt,
         @JsonProperty("last_password_changed") Long lastPasswordChangedAt,
-        @JsonProperty("premium_account") boolean premiumAccount,
         @JsonProperty("business_details") String businessDetails,
         @JsonProperty("created_at") long createdAt,
         @JsonProperty("updated_at") Long updatedAt
 ) {
-
-    public static ProfileDTO notFound() {
-        return new ProfileDTO(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                -1,
-                -1L,
-                false,
-                null,
-                -1,
-                -1L
-        );
-    }
 
     public static ProfileDTO fromProfile(final Profile profile) {
         return new ProfileDTO(
@@ -56,7 +34,6 @@ public record ProfileDTO(
                 profile.getZipcode(),
                 profile.getLastLoginAt(),
                 profile.getLastPasswordChangedAt(),
-                profile.isPremiumAccount(),
                 profile.getBusinessDetails(),
                 profile.getCreatedAt(),
                 profile.getUpdatedAt()
