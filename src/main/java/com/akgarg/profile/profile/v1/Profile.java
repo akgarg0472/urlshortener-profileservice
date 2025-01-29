@@ -38,6 +38,9 @@ public class Profile {
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
+    @Column(name = "user_login_type")
+    private String userLoginType;
+
     @Column(name = "phone")
     private String phone;
 
@@ -84,6 +87,7 @@ public class Profile {
                 "id='" + id + '\'' +
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
+                ", userLoginType='" + userLoginType + '\'' +
                 '}';
     }
 

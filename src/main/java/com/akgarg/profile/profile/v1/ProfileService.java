@@ -224,6 +224,11 @@ public class ProfileService {
 
         final var profile = getProfileById(requestId, profileId);
 
+        if (isOAuthLoginType(profile.getUserLoginType())) {
+            LOGGER.info("[{}] update password login type: {}", requestId, profile.getUserLoginType());
+            return UpdateResponse.badRequest("OAuth profile is not allowed to reset password");
+        }
+
         if (!matchPassword(updatePasswordRequest.currentPassword(), profile.getPassword())) {
             LOGGER.warn("[{}] incorrect password provided", requestId);
             return UpdateResponse.badRequest("Incorrect current password");
@@ -276,6 +281,10 @@ public class ProfileService {
 
     private boolean isUpdateParamValid(final String reqParam, final String profileParam) {
         return reqParam != null && !Objects.equals(reqParam, profileParam);
+    }
+
+    private boolean isOAuthLoginType(final String loginType) {
+        return loginType != null && !loginType.isBlank() && loginType.toLowerCase().contains("oauth");
     }
 
 }
