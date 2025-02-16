@@ -82,16 +82,8 @@ public class MysqlDatabaseService implements DatabaseService {
 
     @Override
     public boolean deleteProfileById(final String profileId) {
-        final var profileOptional = profileRepository.findById(profileId);
-
-        if (profileOptional.isPresent()) {
-            final var profile = profileOptional.get();
-            profile.setDeleted(true);
-            profileRepository.save(profile);
-            return true;
-        } else {
-            throw new DatabaseException(PROFILE_NOT_FOUND_BY_ID_MSG.formatted(profileId), 500);
-        }
+        profileRepository.deleteById(profileId);
+        return true;
     }
 
 }
