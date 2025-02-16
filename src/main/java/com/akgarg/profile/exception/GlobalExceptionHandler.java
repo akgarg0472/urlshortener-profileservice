@@ -1,6 +1,7 @@
 package com.akgarg.profile.exception;
 
 import com.akgarg.profile.response.ApiErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 
 import static com.akgarg.profile.response.ApiErrorResponse.*;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -29,14 +31,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(final Exception e) {
-        e.printStackTrace();
+        if (log.isDebugEnabled()) {
+            log.error("Exception occurred while processing request", e);
+        }
 
         final ApiErrorResponse errorResponse = switch (e) {
             case HttpRequestMethodNotSupportedException ex ->
                     methodNotAllowedErrorResponse("Request HTTP method '" + ex.getMethod() + "' is not allowed. Allowed: " + Arrays.toString(ex.getSupportedMethods()));
             case HttpMediaTypeNotSupportedException ex ->
                     badRequestErrorResponse("Media type '" + ex.getContentType() + "' is not supported");
-            case HttpMessageNotReadableException ex -> badRequestErrorResponse("Please provide valid request body");
+            case HttpMessageNotReadableException ignored ->
+                    badRequestErrorResponse("Please provide valid request body");
             case NoResourceFoundException ex ->
                     resourceNotFoundErrorResponse("Requested resource not found: " + ex.getResourcePath());
             case ResourceNotFoundException ex -> resourceNotFoundErrorResponse(ex.getMessage());
