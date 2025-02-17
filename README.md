@@ -1,7 +1,7 @@
 # URL Shortener Profile Service
 
 ![Java Version](https://img.shields.io/badge/Java-21-blue)
-![version](https://img.shields.io/badge/version-1.0.6-blue)
+![version](https://img.shields.io/badge/version-1.1.0-blue)
 
 ## Table of Contents
 
@@ -59,7 +59,7 @@ The application uses two main configuration files: `application.yml` for general
 
 ### application.yml
 
-This file contains general configurations related to the Spring Boot application, Eureka, and server settings.
+This file contains general configurations related to the Spring Boot application, Consul, and server settings.
 
 ```yml
 spring:
@@ -69,13 +69,23 @@ spring:
     bootstrap-servers: localhost:9092
   profiles:
     active: prod
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    enabled: true
-
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
+        instance-id: ${spring.application.name}-${spring.application.instance_id:${random.value}}
+        register: true
+        fail-fast: true
+        enabled: true
+        prefer-ip-address: true
+        catalog-services-watch-delay: 30000
+        health-check-interval: 30s
+        register-health-check: off
+        health-check-path: /admin/management/health
+        heartbeat:
+          reregister-service-on-failure: true
 server:
   port: 8566
 ```
@@ -85,7 +95,7 @@ server:
 - **spring.application.name**: The name of the Spring Boot application.
 - **spring.kafka.bootstrap-servers**: Kafka server settings for communication.
 - **spring.profiles.active**: Specifies the active profile, here set to prod.
-- **Eureka**: Configuration for the Eureka service registry.
+- **Consul**: Configuration for the Consul service registry.
 - **Server Port**: Configures the port for the server (8566 in this case).
 
 ### application-prod.yml
