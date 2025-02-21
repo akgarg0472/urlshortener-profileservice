@@ -56,7 +56,7 @@ public class DatabaseTestUtil {
     }
 
     private static DataSource configureDatasource() {
-        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        final var dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://localhost:3306/urlshortener_users_test?createDatabaseIfNotExist=true");
         dataSource.setUsername("root");
@@ -69,18 +69,17 @@ public class DatabaseTestUtil {
     }
 
     static Profile getProfileObject(final String profileId) {
-        final Profile profile = new Profile();
+        final var profile = new Profile();
         profile.setId(profileId);
         profile.setEmail(faker.internet().emailAddress());
         profile.setPassword(faker.random().toString());
-//        profile.setUsername(faker.internet().uuid().substring(0, 8));
         profile.setName(faker.name().name());
         profile.setScopes("test");
         return profile;
     }
 
     static Profile getProfileObject(final String profileId, final String email) {
-        final Profile profile = getProfileObject(profileId);
+        final var profile = getProfileObject(profileId);
         profile.setEmail(email);
         return profile;
     }

@@ -32,7 +32,7 @@ class LocalStorageImageServiceTest {
         final var imageFile = new MockMultipartFile("test.jpg", "test.jpg", "image/jpeg", new byte[0]);
 
         for (int i = 1; i <= idsToGenerate; i++) {
-            final String imageId = imageService.generateImageId(imageFile);
+            final var imageId = imageService.generateImageId(imageFile);
             assertThat(imageId).isNotBlank();
             assertFalse(imageIds.contains(imageId));
             imageIds.add(imageId);
@@ -46,31 +46,30 @@ class LocalStorageImageServiceTest {
 
         final var totalThreads = 10_000;
         final var latch = new CountDownLatch(totalThreads);
-        final var idsToGeneratePerThread = 1_000;
-        final var executorService = Executors.newFixedThreadPool(totalThreads);
-        final var imageFile = new MockMultipartFile("test.jpg", "test.jpg", "image/jpeg", new byte[0]);
 
-        final Runnable testTask = getRunnableTask(idsToGeneratePerThread, imageFile, latch);
+        try (final var executorService = Executors.newFixedThreadPool(totalThreads)) {
+            final var imageFile = new MockMultipartFile("test.jpg", "test.jpg", "image/jpeg", new byte[0]);
 
-        for (int i = 0; i < totalThreads; i++) {
-            executorService.submit(testTask);
+            final var testTask = getRunnableTask(imageFile, latch);
+
+            for (var i = 0; i < totalThreads; i++) {
+                executorService.submit(testTask);
+            }
+
+            latch.await();
         }
-
-        latch.await();
-        executorService.shutdown();
     }
 
     private Runnable getRunnableTask(
-            final int idsToGeneratePerThread,
             final MockMultipartFile imageFile,
             final CountDownLatch latch
     ) {
         final var generatedImageIds = new ConcurrentHashMap<String, Object>();
-        final Object mapValue = new Object();
+        final var mapValue = new Object();
 
         return () -> {
             try {
-                for (int i = 0; i < idsToGeneratePerThread; i++) {
+                for (int i = 0; i < 1000; i++) {
                     final var imageId = imageService.generateImageId(imageFile);
                     assertFalse(imageId.isEmpty());
                     assertFalse(generatedImageIds.containsKey(imageId));
@@ -81,6 +80,5 @@ class LocalStorageImageServiceTest {
             }
         };
     }
-
 
 }

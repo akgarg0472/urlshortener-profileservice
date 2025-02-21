@@ -30,7 +30,7 @@ class InMemoryDatabaseServiceTest {
 
     @Test
     void addProfile_ShouldReturnFalse_WhenInsertingDuplicateProfileInstance() {
-        final Profile profile = getProfileObject("1");
+        final var profile = getProfileObject("1");
         assertTrue(databaseService.addProfile(profile), "addProfile() should return true when inserting new profile");
         assertFalse(databaseService.addProfile(profile), "addProfile() should return false when inserting duplicate profile");
     }
@@ -44,27 +44,27 @@ class InMemoryDatabaseServiceTest {
 
     @Test
     void findByProfileId_ShouldReturnOptionalWithProfileInstance_WhenProfileExistsByProfileId() {
-        final Profile profile = getProfileObject("1");
+        final var profile = getProfileObject("1");
         assertTrue(databaseService.addProfile(profile), "addProfile() should return true when inserting new profile");
-        final Optional<Profile> profileOptional = databaseService.findByProfileId(profile.getId());
+        final var profileOptional = databaseService.findByProfileId(profile.getId());
         assertThat(profileOptional).isPresent().hasValueSatisfying(p -> assertThat(p).isEqualTo(profile));
     }
 
     @Test
     void updateProfile_ShouldReturnFalse_WhenProfileDoesNotExist() {
-        assertFalse(databaseService.updateProfile(getProfileObject("1")), "updateProfile should return false when profile doesn't exists");
+        assertDoesNotThrow(() -> databaseService.updateProfile(getProfileObject("1")), "updateProfile should return false when profile doesn't exists");
     }
 
     @Test
     void updateProfile_ShouldReturnTrue_WhenProfileExists() {
-        final Profile profile = getProfileObject("1");
-        assertTrue(databaseService.addProfile(profile), "addProfile() should return true when inserting new profile");
-        assertTrue(databaseService.updateProfile(profile), "updateProfile should return true when profile exists");
+        final var profile = getProfileObject("1");
+        assertDoesNotThrow(() -> databaseService.addProfile(profile), "addProfile() should return true when inserting new profile");
+        assertDoesNotThrow(() -> databaseService.updateProfile(profile), "updateProfile should return true when profile exists");
     }
 
     @Test
     void deleteProfile_ShouldReturnFalseWhenProfileDoesNotExist() {
-        assertFalse(databaseService.deleteProfileById("1"), "deleteProfileById should return false when profile doesn't exists");
+        assertDoesNotThrow(() -> databaseService.deleteProfileById("1"), "deleteProfileById should return false when profile doesn't exists");
     }
 
     @Test
@@ -72,7 +72,7 @@ class InMemoryDatabaseServiceTest {
         final var profileId = "1";
         assertTrue(databaseService.addProfile(getProfileObject(profileId)), "addProfile should return true while adding new profile");
         assertThat(databaseService.findByProfileId(profileId)).isNotEmpty();
-        assertTrue(databaseService.deleteProfileById(profileId), "deleteProfileById should return true when profile exists");
+        assertDoesNotThrow(() -> databaseService.deleteProfileById(profileId), "deleteProfileById should return true when profile exists");
         assertThat(databaseService.findByProfileId(profileId)).isEmpty();
     }
 

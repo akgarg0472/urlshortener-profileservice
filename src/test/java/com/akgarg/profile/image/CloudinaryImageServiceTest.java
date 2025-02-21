@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,10 +34,10 @@ class CloudinaryImageServiceTest {
     void testUploadImage() {
         assertNotNull(imageService, "Image service is null");
 
-        final MultipartFile image = getImage();
+        final var image = getImage();
         assertNotNull(image, "Image file to upload is null");
 
-        final Optional<String> uploadImageUrl = imageService.uploadImage(null, image);
+        final var uploadImageUrl = imageService.uploadImage(image);
         assertThat(uploadImageUrl).isNotEmpty();
     }
 
