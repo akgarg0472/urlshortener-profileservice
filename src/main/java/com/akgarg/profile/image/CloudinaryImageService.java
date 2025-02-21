@@ -20,7 +20,7 @@ public class CloudinaryImageService extends AbstractImageService {
     }
 
     @Override
-    public Optional<String> uploadImage(final Object requestId, final MultipartFile image) {
+    public Optional<String> uploadImage(final MultipartFile image) {
         final var imageId = generateImageId(image);
 
         try {
@@ -33,13 +33,13 @@ public class CloudinaryImageService extends AbstractImageService {
             final var uploadResult = cloudinary.uploader().upload(image.getBytes(), uploadOptions);
             return Optional.of(Objects.requireNonNull(uploadResult.get("secure_url")).toString());
         } catch (Exception e) {
-            log.error("[{}] Error uploading image file to cloudinary", requestId, e);
+            log.error("Error uploading image file to cloudinary", e);
             return Optional.empty();
         }
     }
 
     @Override
-    public void deleteImage(final Object requestId, final String imageUrl) {
+    public void deleteImage(final String imageUrl) {
         try {
             final var imageId = extractImageId(imageUrl);
 
@@ -47,11 +47,11 @@ public class CloudinaryImageService extends AbstractImageService {
                 final var deleteResult = cloudinary.uploader().destroy(imageId, ObjectUtils.emptyMap()).get("result");
 
                 if (deleteResult != null && deleteResult.equals("ok")) {
-                    log.info("[{}] Deleted image: {}", requestId, imageUrl);
+                    log.info("Deleted image: {}", imageUrl);
                 }
             }
         } catch (Exception e) {
-            log.error("[{}] Error deleting image from cloudinary", requestId, e);
+            log.error("Error deleting image from cloudinary", e);
         }
     }
 

@@ -10,11 +10,9 @@ import com.akgarg.profile.request.UpdateProfileRequest;
 import com.akgarg.profile.response.DeleteResponse;
 import com.akgarg.profile.response.UpdateResponse;
 import jakarta.annotation.Nonnull;
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,157 +21,118 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.akgarg.profile.utils.ProfileUtils.extractRequestIdFromRequest;
-
+@Slf4j
 @Service
+@RequiredArgsConstructor
+@SuppressWarnings("LoggingSimilarMessage")
 public class ProfileService {
 
-    private static final Logger LOGGER = LogManager.getLogger(ProfileService.class);
-    private static final int PASSWORD_ENCODER_STRENGTH = 10;
-
-    private final DatabaseService databaseService;
-    private final ImageService imageService;
     private final NotificationService notificationService;
+    private final DatabaseService databaseService;
     private final PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
 
-    public ProfileService(
-            @Nonnull final DatabaseService databaseService,
-            @Nonnull final ImageService imageService,
-            @Nonnull final NotificationService notificationService
-    ) {
-        this.databaseService = databaseService;
-        this.imageService = imageService;
-        this.notificationService = notificationService;
-        this.passwordEncoder = new BCryptPasswordEncoder(PASSWORD_ENCODER_STRENGTH);
-    }
-
-    public Optional<ProfileDTO> getProfileByProfileId(
-            @Nonnull final HttpServletRequest httpRequest,
-            @Nonnull final String profileId
-    ) {
+    public Optional<ProfileDTO> getProfileByProfileId(@Nonnull final String profileId) {
         checkProfileId(profileId);
 
-        final var requestId = extractRequestIdFromRequest(httpRequest);
+        log.info("Get profile request received for id {}", profileId);
 
-        LOGGER.debug("[{}] get profile received for profile id: {}", requestId, profileId);
+        final var profile = getProfileById(profileId);
 
-        final Optional<Profile> profile = databaseService.findByProfileId(profileId);
-
-        if (profile.isEmpty()) {
-            LOGGER.error("[{}] profile not found by id: {}", requestId, profileId);
-            return Optional.empty();
-        }
-
-        return Optional.of(ProfileDTO.fromProfile(profile.get()));
+        return Optional.of(ProfileDTO.fromProfile(profile));
     }
 
-    public DeleteResponse deleteProfile(
-            @Nonnull final HttpServletRequest httpRequest,
-            @Nonnull final String profileId
-    ) {
+    public DeleteResponse deleteProfile(@Nonnull final String profileId) {
         checkProfileId(profileId);
 
-        final var requestId = extractRequestIdFromRequest(httpRequest);
+        log.info("Delete profile request received for id {}", profileId);
 
-        LOGGER.info("[{}] Profile delete request for id={} received", requestId, profileId);
+        getProfileById(profileId);
 
-        getProfileById(requestId, profileId);
+        databaseService.deleteProfileById(profileId);
 
-        final boolean profileDeleted = databaseService.deleteProfileById(profileId);
-
-        if (profileDeleted) {
-            LOGGER.info("[{}] profile deleted successfully with id={}", requestId, profileId);
-            return new DeleteResponse(HttpStatus.OK.value(), "Profile deleted successfully");
-        }
-
-        return new DeleteResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error deleting profile for id: " + profileId);
+        log.info("Profile deleted successfully with id {}", profileId);
+        return new DeleteResponse(HttpStatus.OK.value(), "Profile deleted successfully");
     }
 
-    public UpdateResponse updateProfile(
-            @Nonnull final HttpServletRequest httpRequest,
-            @Nonnull final String profileId,
-            @Nonnull final UpdateProfileRequest request
-    ) {
+    public UpdateResponse updateProfile(@Nonnull final String profileId, @Nonnull final UpdateProfileRequest request) {
         checkProfileId(profileId);
+
         checkUpdateProfileRequestForAllNullValues(request);
 
-        final var requestId = extractRequestIdFromRequest(httpRequest);
+        log.info("Update Profile request received for id {}", profileId);
 
-        LOGGER.info("[{}] Profile update request for id={} received: {}", requestId, profileId, request);
+        if (log.isDebugEnabled()) {
+            log.debug("Received request: {}", request);
+        }
 
-        final var profile = getProfileById(requestId, profileId);
+        final var profile = getProfileById(profileId);
 
         boolean isProfileDataUpdated = false;
 
         if (isValidProfilePicture(request.getProfilePicture())) {
-            final var updatedProfilePictureUrl = imageService.uploadImage(requestId, request.getProfilePicture());
+            final var updatedProfilePictureUrl = imageService.uploadImage(request.getProfilePicture());
             final var previousProfilePicture = profile.getProfilePictureUrl();
 
             if (updatedProfilePictureUrl.isPresent()) {
                 isProfileDataUpdated = true;
-                LOGGER.info("[{}] profile picture uploaded successfully for profileId={}", requestId, profileId);
+                log.debug("Profile picture uploaded successfully for id {}", profileId);
                 profile.setProfilePictureUrl(updatedProfilePictureUrl.get());
-                imageService.deleteImage(requestId, previousProfilePicture);
+                imageService.deleteImage(previousProfilePicture);
             }
         }
 
         if (isUpdateParamValid(request.getName(), profile.getName())) {
             profile.setName(request.getName().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile name updated", requestId);
+            log.debug("Profile name updated");
         }
 
         if (isUpdateParamValid(request.getBio(), profile.getBio())) {
             profile.setBio(request.getBio().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile bio updated", requestId);
+            log.debug("Profile bio updated");
         }
 
         if (isUpdateParamValid(request.getPhone(), profile.getPhone())) {
             profile.setPhone(request.getPhone().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile phone updated", requestId);
+            log.debug("Profile phone number updated");
         }
 
         if (isUpdateParamValid(request.getCity(), profile.getCity())) {
             profile.setCity(request.getCity().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile city updated", requestId);
+            log.debug("Profile city updated");
         }
 
         if (isUpdateParamValid(request.getState(), profile.getState())) {
             profile.setState(request.getState().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile state updated", requestId);
+            log.debug("Profile state updated");
         }
 
         if (isUpdateParamValid(request.getCountry(), profile.getCountry())) {
             profile.setCountry(request.getCountry().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile country updated", requestId);
+            log.debug("Profile country updated");
         }
 
         if (isUpdateParamValid(request.getZipcode(), profile.getZipcode())) {
             profile.setZipcode(request.getZipcode().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile zipcode updated", requestId);
+            log.debug("Profile zipcode updated");
         }
 
         if (isUpdateParamValid(request.getBusinessDetails(), profile.getBusinessDetails())) {
             profile.setBusinessDetails(request.getBusinessDetails().trim());
             isProfileDataUpdated = true;
-            LOGGER.debug("[{}] profile business details updated", requestId);
+            log.debug("Profile business details updated");
         }
 
         if (isProfileDataUpdated) {
-            final var profileUpdated = databaseService.updateProfile(profile);
-
-            if (!profileUpdated) {
-                LOGGER.error("[{}] profile update failed", requestId);
-                return UpdateResponse.internalServerError("Error updating profile. Try again later");
-            }
-
-            LOGGER.info("[{}] profile updated successfully for id={}", requestId, profileId);
+            databaseService.updateProfile(profile);
+            log.info("Profile updated successfully for id {}", profileId);
             return UpdateResponse.ok("Profile successfully updated");
         }
 
@@ -181,8 +140,10 @@ public class ProfileService {
     }
 
     private boolean isValidProfilePicture(final MultipartFile profilePicture) {
-        if (profilePicture == null) return false;
-        final String contentType = profilePicture.getContentType();
+        if (profilePicture == null) {
+            return false;
+        }
+        final var contentType = profilePicture.getContentType();
         return contentType != null && contentType.startsWith("image");
     }
 
@@ -206,55 +167,47 @@ public class ProfileService {
         }
     }
 
-    public UpdateResponse updatePassword(
-            @Nonnull final HttpServletRequest httpRequest,
-            @Nonnull final String profileId,
-            @Nonnull final UpdatePasswordRequest updatePasswordRequest
-    ) {
+    public UpdateResponse updatePassword(@Nonnull final String profileId, @Nonnull final UpdatePasswordRequest updatePasswordRequest) {
         checkProfileId(profileId);
 
-        final var requestId = extractRequestIdFromRequest(httpRequest);
+        log.info("Update password request received for id {}", profileId);
 
-        LOGGER.info("[{}] update password request: {}", requestId, profileId);
+        if (log.isDebugEnabled()) {
+            log.debug("Received request: {}", updatePasswordRequest);
+        }
 
         if (!arePasswordsEqual(updatePasswordRequest)) {
-            LOGGER.warn("[{}] New password and confirm password mismatched", requestId);
+            log.info("New password and confirm password mismatched");
             return UpdateResponse.badRequest("New password and confirm password mismatched");
         }
 
-        final var profile = getProfileById(requestId, profileId);
+        final var profile = getProfileById(profileId);
 
         if (isOAuthLoginType(profile.getUserLoginType())) {
-            LOGGER.info("[{}] update password login type: {}", requestId, profile.getUserLoginType());
-            return UpdateResponse.badRequest("OAuth profile is not allowed to reset password");
+            log.info("User login type is {} which is not allowed", profile.getUserLoginType());
+            return UpdateResponse.badRequest("OAuth login profile is not allowed to reset password");
         }
 
         if (!matchPassword(updatePasswordRequest.currentPassword(), profile.getPassword())) {
-            LOGGER.warn("[{}] incorrect password provided", requestId);
+            if (log.isDebugEnabled()) {
+                log.debug("Incorrect password provided");
+            }
             return UpdateResponse.badRequest("Incorrect current password");
         }
 
         final var encryptedPassword = encryptPassword(updatePasswordRequest.newPassword());
-        final var isPasswordUpdated = databaseService.updatePassword(profileId, encryptedPassword);
+        databaseService.updatePassword(profileId, encryptedPassword);
 
-        if (!isPasswordUpdated) {
-            LOGGER.error("[{}] password update failed", requestId);
-            return UpdateResponse.internalServerError("Error updating password. Please try again");
-        }
-
-        LOGGER.info("[{}] password updated successfully", requestId);
+        log.info("Password updated successfully");
         notificationService.sendPasswordChangedSuccessEmail(profile.getEmail(), profile.getName());
         return UpdateResponse.ok("Password updated successfully");
     }
 
-    private Profile getProfileById(
-            @Nonnull final Object requestId,
-            @Nonnull final String profileId
-    ) {
+    private Profile getProfileById(@Nonnull final String profileId) {
         return databaseService.findByProfileId(profileId)
                 .orElseThrow(() -> {
-                    LOGGER.warn("[{}] profile not found with id: {}", requestId, profileId);
-                    return new ResourceNotFoundException("Profile not found with id: " + profileId);
+                    log.info("Profile not found for id {}", profileId);
+                    return new ResourceNotFoundException("Profile not found for id: " + profileId);
                 });
     }
 
@@ -266,10 +219,7 @@ public class ProfileService {
         return passwordEncoder.encode(rawPassword);
     }
 
-    private boolean matchPassword(
-            @Nonnull final String rawPassword,
-            @Nonnull final String hashedPassword
-    ) {
+    private boolean matchPassword(@Nonnull final String rawPassword, @Nonnull final String hashedPassword) {
         return passwordEncoder.matches(rawPassword, hashedPassword);
     }
 

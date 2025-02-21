@@ -6,8 +6,8 @@ import java.util.Optional;
 
 public interface ImageService {
 
-    Optional<String> uploadImage(Object requestId, MultipartFile image);
+    Optional<String> uploadImage(MultipartFile image);
 
-    void deleteImage(Object requestId, String imageUrl);
+    void deleteImage(String imageUrl);
 
 }

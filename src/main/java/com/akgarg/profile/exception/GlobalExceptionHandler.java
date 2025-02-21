@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(final Exception e) {
         if (log.isDebugEnabled()) {
-            log.error("Exception occurred while processing request", e);
+            log.error("Handling exception", e);
         }
 
         final ApiErrorResponse errorResponse = switch (e) {

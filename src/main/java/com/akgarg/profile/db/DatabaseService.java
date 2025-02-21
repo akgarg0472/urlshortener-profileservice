@@ -2,7 +2,6 @@ package com.akgarg.profile.db;
 
 import com.akgarg.profile.profile.v1.Profile;
 
-import java.util.Collection;
 import java.util.Optional;
 
 public interface DatabaseService {
@@ -11,13 +10,10 @@ public interface DatabaseService {
 
     Optional<Profile> findByProfileId(String profileId);
 
-    Collection<Profile> findAllProfiles();
+    void updateProfile(Profile profile);
 
-    boolean updateProfile(Profile profile);
+    void updatePassword(String profileId, String encryptedPassword);
 
-    boolean updatePassword(String profileId, String encryptedPassword);
-
-    boolean deleteProfileById(String profileId);
-
+    void deleteProfileById(String profileId);
 
 }

@@ -15,9 +15,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class BeanConfigs {
+
+    private static final int PASSWORD_ENCODER_STRENGTH = 10;
 
     @Profile("dev")
     @Bean("databaseService")
@@ -53,6 +57,11 @@ public class BeanConfigs {
     @Bean("imageService")
     public ImageService cloudImageService(final Environment environment) {
         return new CloudinaryImageService(environment);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(PASSWORD_ENCODER_STRENGTH);
     }
 
 }

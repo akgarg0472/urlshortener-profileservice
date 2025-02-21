@@ -36,7 +36,7 @@ public class LocalStorageImageService extends AbstractImageService implements In
     }
 
     @Override
-    public Optional<String> uploadImage(final Object requestId, final MultipartFile image) {
+    public Optional<String> uploadImage(final MultipartFile image) {
         Objects.requireNonNull(image, "Image can't be null");
 
         try {
@@ -47,19 +47,19 @@ public class LocalStorageImageService extends AbstractImageService implements In
             storeFile(convertedFile);
             return Optional.of(convertedFile.getAbsolutePath());
         } catch (IOException e) {
-            log.error("[{}] Error storing image: {}", requestId, e.getMessage());
+            log.error("Error storing image: {}", e.getMessage());
             return Optional.empty();
         }
     }
 
     @Override
-    public void deleteImage(final Object requestId, final String imageUrl) {
+    public void deleteImage(final String imageUrl) {
         final var path = Path.of(TMP_IMAGE_DIR + File.separator + imageUrl);
         try {
             final var fileDeleted = Files.deleteIfExists(path);
-            log.info("[{}] Image file with id={} delete result: {}", requestId, imageUrl, fileDeleted);
+            log.info("Image file with id={} delete result: {}", imageUrl, fileDeleted);
         } catch (IOException e) {
-            log.error("[{}] Error deleting image with id: {}", requestId, imageUrl);
+            log.error("Error deleting image with id: {}", imageUrl);
         }
     }
 

@@ -2,7 +2,6 @@ package com.akgarg.profile.db;
 
 import com.akgarg.profile.profile.v1.Profile;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,41 +31,36 @@ public class InMemoryDatabaseService implements DatabaseService {
     }
 
     @Override
-    public boolean updateProfile(final Profile profile) {
+    public void updateProfile(final Profile profile) {
         Objects.requireNonNull(profile, "Profile can't be null");
 
         if (!db.containsKey(profile.getId())) {
-            return false;
+            return;
         }
 
-        return db.put(profile.getId(), profile) != null;
+        db.put(profile.getId(), profile);
     }
 
     @Override
-    public boolean deleteProfileById(final String profileId) {
+    public void deleteProfileById(final String profileId) {
         Objects.requireNonNull(profileId, PROFILE_ID_CANT_NULL);
-        return db.remove(profileId) != null;
+        db.remove(profileId);
     }
 
     @Override
-    public boolean updatePassword(final String profileId, final String encryptedPassword) {
+    public void updatePassword(final String profileId, final String encryptedPassword) {
         Objects.requireNonNull(profileId, PROFILE_ID_CANT_NULL);
         Objects.requireNonNull(encryptedPassword, "Encrypted password can't be null");
 
         final Profile profile = db.get(profileId);
 
         if (profile == null) {
-            return false;
+            return;
         }
 
         profile.setPassword(encryptedPassword);
 
-        return db.put(profileId, profile) != null;
-    }
-
-    @Override
-    public Collection<Profile> findAllProfiles() {
-        return db.values();
+        db.put(profileId, profile);
     }
 
     private boolean isProfileExistsByEmail(final String email) {

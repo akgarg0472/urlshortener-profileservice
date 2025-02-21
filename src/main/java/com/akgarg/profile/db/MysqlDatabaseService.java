@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -42,12 +41,7 @@ public class MysqlDatabaseService implements DatabaseService {
     }
 
     @Override
-    public Collection<Profile> findAllProfiles() {
-        throw new UnsupportedOperationException("Fetching all profiles is not supported by the MySQL database service");
-    }
-
-    @Override
-    public boolean updateProfile(final Profile profile) {
+    public void updateProfile(final Profile profile) {
         Objects.requireNonNull(profile, "Profile to update can't be null");
 
         final var existingProfile = profileRepository.findByIdAndDeletedFalse(profile.getId());
@@ -58,32 +52,40 @@ public class MysqlDatabaseService implements DatabaseService {
 
         try {
             profileRepository.save(profile);
-            return true;
-        } catch (DataIntegrityViolationException e) {
-            log.error("Error updating profile: ", e);
-            throw new DatabaseException("Database constraint violation", 500);
+        } catch (Exception e) {
+            log.error("Error updating profile", e);
+            throw new DatabaseException("Failed to update profile", 500);
         }
     }
 
     @Override
-    public boolean updatePassword(final String profileId, final String encryptedPassword) {
+    public void updatePassword(final String profileId, final String encryptedPassword) {
         final var profileOptional = profileRepository.findByIdAndDeletedFalse(profileId);
 
-        if (profileOptional.isPresent()) {
-            final var profile = profileOptional.get();
-            profile.setPassword(encryptedPassword);
-            profile.setLastPasswordChangedAt(System.currentTimeMillis());
+        if (profileOptional.isEmpty()) {
+            throw new DatabaseException(PROFILE_NOT_FOUND_BY_ID_MSG.formatted(profileId), 404);
+        }
+
+        final var profile = profileOptional.get();
+        profile.setPassword(encryptedPassword);
+        profile.setLastPasswordChangedAt(System.currentTimeMillis());
+
+        try {
             profileRepository.save(profile);
-            return true;
-        } else {
-            throw new DatabaseException(PROFILE_NOT_FOUND_BY_ID_MSG.formatted(profileId), 500);
+        } catch (Exception e) {
+            log.error("Error saving updated profile in database", e);
+            throw new DatabaseException("Failed to store updated password profile", 500);
         }
     }
 
     @Override
-    public boolean deleteProfileById(final String profileId) {
-        profileRepository.deleteById(profileId);
-        return true;
+    public void deleteProfileById(final String profileId) {
+        try {
+            profileRepository.deleteById(profileId);
+        } catch (Exception e) {
+            log.error("Error deleting profile for id {}", profileId, e);
+            throw new DatabaseException("Failed to delete profile for id: %s".formatted(profileId), 500);
+        }
     }
 
 }
