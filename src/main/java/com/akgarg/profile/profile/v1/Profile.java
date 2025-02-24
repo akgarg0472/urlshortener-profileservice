@@ -35,7 +35,7 @@ public class Profile {
     @Column(name = "bio")
     private String bio;
 
-    @Column(name = "profile_picture_url")
+    @Column(name = "profile_picture_url", columnDefinition = "TEXT")
     private String profilePictureUrl;
 
     @Column(name = "user_login_type")
