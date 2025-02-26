@@ -36,6 +36,7 @@ public class MysqlDatabaseService implements DatabaseService {
 
     @Override
     public Optional<Profile> findByProfileId(final String profileId) {
+        log.info("Finding profile by id {}", profileId);
         Objects.requireNonNull(profileId, PROFILE_ID_NULL_MSG);
         return profileRepository.findByIdAndDeletedFalse(profileId);
     }
